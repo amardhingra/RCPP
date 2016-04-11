@@ -12,6 +12,7 @@
 #include <boost/bind.hpp>
 
 // thread-safe signal handling, used for the notification system
+// Not currently used but will probably be useful later
 //http://www.boost.org/doc/libs/1_43_0/doc/html/signals2.html
 #include <boost/signals2.hpp> 
 
@@ -118,11 +119,9 @@ int main() {
 	//keyboard_stream.my_source = keyboard_source;
 
 	subscriber mysub;
-	mysub.on_next = [](event new_event) { cout << "lol" << endl; };
+	mysub.on_next = [](event new_event) { cout << new_event.data << endl; };
 
 	keyboard_stream.subscribe(mysub);
-
-
 
 	boost::thread t2(boost::bind(&stream::get_keyboard_input, &keyboard_stream));
 	t2.join();
