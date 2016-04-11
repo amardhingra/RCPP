@@ -19,7 +19,9 @@ public:
 
     LinkedExpression(ExpressionGraph<T> eg, var<T>& t) : graph(eg), to(t) {};
 
-    void update();
+    void update(){
+        to = graph.evaluate();
+    }
 
 };
 

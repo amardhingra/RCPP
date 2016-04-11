@@ -11,8 +11,9 @@ class LinkedExpression;
 
 template<typename T>
 class var {
+public:
+        T data;
 private:
-    T data;
     LinkedExpression<T> *l;
     void update(){
         if(l){

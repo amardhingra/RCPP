@@ -18,7 +18,9 @@ public:
     var<T>& va;
     ValueNode(var<T>& v) : va(v) {};
 
-    T evaluate();
+    T evaluate(){
+        return va.data;
+    }
 };
 
 template <typename T>
@@ -35,7 +37,16 @@ public:
 
     UnaryNode(UnaryNode::Op o, Node<T>* n) : node(n), op(o) {};
 
-    T evaluate();
+    //T evaluate();//
+    T evaluate(){
+    if(op == UnaryNode::PLUS){
+        return +node->evaluate();
+    } else if(op == UnaryNode::MINUS){
+        return -node->evaluate();
+    } else if(op == UnaryNode::NOT){
+        return !node->evaluate();
+    }
+}
 };
 
 template <typename T>
@@ -54,7 +65,19 @@ public:
 
     BinaryNode(Node<T>* l, BinaryNode::Op o, Node<T> *r) : left(l), right(r), op(o) {};
 
-    T evaluate();
+    T evaluate(){
+        if(op == BinaryNode::PLUS){
+            return left->evaluate() + right->evaluate();
+        } else if(op == BinaryNode::MINUS){
+            return left->evaluate() - right->evaluate();
+        } else if(op == BinaryNode::TIMES){
+            return left->evaluate() * right->evaluate();
+        } else if(op == BinaryNode::DIV){
+            return left->evaluate() / right->evaluate();
+        } else {
+            return T();
+        }
+    }
 };
 
 #endif
