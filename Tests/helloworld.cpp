@@ -1,8 +1,45 @@
-// must have boost installed
-// with homebrew: brew install boost
+// Compilation instructions:
+// 1. Must have boost installed. With homebrew: brew install boost
+// 2. cd into Test/ directory and type "make"
+// 3. run "helloworld"
+// 4. Type stuff into command line and see that it's echoed back at you
 
-// assumptions: streams are immutable, but can be mirrored
-// refs: Java SE7 Observable, RxJava, RxJS, boost::signals2, boost::thread, wiki page for observer pattern, 
+/* 
+References ----------------------------------------------------------
+
+Wikipedia for "Observer Pattern"
+https://en.wikipedia.org/wiki/Observer_pattern
+
+Java SE7 Observable API
+https://docs.oracle.com/javase/7/docs/api/java/util/Observable.html
+
+Rx Docs:
+http://reactivex.io/documentation/operators.html#creating
+http://reactivex.io/documentation/observable.html
+
+RxJava API
+http://reactivex.io/RxJava/javadoc/rx/Observable.html
+http://reactivex.io/RxJava/javadoc/index.html?rx/Observer.html
+
+RxJS
+https://gist.github.com/staltz/868e7e9bc2a7b8c1f754
+https://github.com/Reactive-Extensions/RxJS/tree/master/doc/api/core
+https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md#rxobservableprototypesubscribeobserver--onnext-onerror-oncompleted
+
+Microsoft's System.Reactive.Linq
+https://msdn.microsoft.com/en-us/library/system.reactive.linq.observable(v=vs.103).aspx 
+
+StackOverflow: How to implement IObservable<T>:
+http://stackoverflow.com/questions/1768974/implementing-iobservablet-from-scratch
+
+boost::signals2
+http://www.boost.org/doc/libs/1_43_0/doc/html/signals2.html
+
+boost::thread
+http://www.boost.org/doc/libs/1_60_0/doc/html/thread/thread_management.html#thread.thread_management.tutorial
+
+*/
+
 // started with diff sources and streams but saw no need for the extra layer of abstraction, at least for this example
 
 #include <iostream>
@@ -18,9 +55,11 @@
 
 using namespace std;
 
-// putting all classes in this one file for testing purposes only
+// Assumptions: streams are immutable, but can be mirrored
+// Putting all classes in this one file for testing purposes only
 
-// A stream consists of events
+// A stream consists of events, which contain data. 
+// For the purposes of testing, currently an event just has a string as its data.
 class event {
 public:
 	string data;
@@ -31,30 +70,11 @@ event::event(string new_data) {
 	data = new_data;
 }
 
-// A source is the input to a stream
-class source {
-public:
-	bool has_next = false;
-	event get_next;
-
-	void get_keyboard_input(void) {
-		while(true) {
-			/*
-			string keyinput;
-			cin >> keyinput;
-			cout << "u entered " << keyinput << endl;*/
-			cout << "rofl ";
-		}
-	}
-};
-
-// A subscriber listens to one or more streams (for testing, a subscriber has one stream)
-// It has a handler for handling the stream's events
+// A subscriber listens to one or more streams.
+// It has 3 handlers for dealing with data received from the stream: one for handling normal events, one for handling errors, and one for handling the completion event.
 class subscriber {
-	//stream my_stream;
 public:
 	// Notifies the subscriber of a new element in the sequence
-	//std::function<void(string)> on_next;
 		std::function<void(event new_event)> on_next;
 };
 
