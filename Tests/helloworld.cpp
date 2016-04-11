@@ -44,22 +44,23 @@ http://www.boost.org/doc/libs/1_60_0/doc/html/thread/thread_management.html#thre
 
 #include <iostream>
 #include <vector>
-#include <thread>
+#include <exception>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 
 // thread-safe signal handling, used for the notification system
 // Not currently used but will probably be useful later
-//http://www.boost.org/doc/libs/1_43_0/doc/html/signals2.html
-#include <boost/signals2.hpp> 
+// #include <boost/signals2.hpp> 
 
 using namespace std;
 
 // Assumptions: streams are immutable, but can be mirrored
 // Putting all classes in this one file for testing purposes only
 
-// A stream consists of events, which contain data. 
-// For the purposes of testing, currently an event just has a string as its data.
+/*
+ A stream consists of events, which contain data. 
+ For the purposes of testing, currently an event just has a string as its data.
+ */
 class event {
 public:
 	string data;
@@ -70,38 +71,65 @@ event::event(string new_data) {
 	data = new_data;
 }
 
-// A subscriber listens to one or more streams.
-// It has 3 handlers for dealing with data received from the stream: one for handling normal events, one for handling errors, and one for handling the completion event.
+/* 
+A subscriber listens to one or more streams.
+ It has 3 handlers for dealing with data received from the stream: one for handling normal events, one for handling errors, and one for handling the completion event.
+ */
 class subscriber {
 public:
-	// Notifies the subscriber of a new element in the sequence
+	// Provides the subscriber with a new event to handle. 
+	// Called by the stream when it has a new event for the subscriber.
 		std::function<void(event new_event)> on_next;
+
+		// Notifies the subscriber that the stream has experienced an error. The error is passed by the stream to the subscriber to handle.
+		std::function<void(exception& new_exception)> on_error;
+
+// Notifies the subscriber that the stream has finished sending events.
+				std::function<void()> on_completed;
+
+
 };
 
-// A stream accumulates sources (currently for testing, a stream only has one source)
+/*
+ A stream emits data for subscribers to the stream to handle.
+ A stream can have many subscribers.
+ */
 class stream {
-	// indicates if there's a new value ready for subscribers to handle
+	// Indicates if the stream has changed
 	bool changed = false;
-	subscriber my_subscriber;
-
+	// List of subscribers that are subscribed to this stream.
+	vector<subscriber> my_subscribers;
 
 public:
-	//source my_source;
 
 	void setChanged() {
 		changed = true;
 	}
 
-	void subscribe(subscriber new_subscriber) {
-		my_subscriber = new_subscriber;
-	}
-
-	void notifySubscribers(event new_event) {
-		my_subscriber.on_next(new_event);
+	void clearChanged() {
 		changed = false;
 	}
 
-	void get_keyboard_input() {
+	bool hasChanged() {
+		return changed;
+	}
+
+	// Add a new subscriber to this stream
+	void subscribe(subscriber new_subscriber) {
+		my_subscribers.push_back(new_subscriber);
+	}
+
+	// If the stream has changed, then notify all subscribers and clear the "changed" variable to indicate that the stream has no longer changed
+	void notifySubscribers(event new_event) {
+		if (this->hasChanged()) {
+		for (subscriber my_subscriber : my_subscribers)
+			my_subscriber.on_next(new_event);
+		clearChanged();
+	}
+	}
+
+	// 
+	static void get_keyboard_input() {
 		while(true) {
 			
 			string keyinput;
@@ -109,7 +137,6 @@ public:
 			
 			setChanged();
 			notifySubscribers(keyinput);
-			//cout << "lmao ";
 		}
 	}
 
@@ -142,9 +169,10 @@ int main() {
 	mysub.on_next = [](event new_event) { cout << new_event.data << endl; };
 
 	keyboard_stream.subscribe(mysub);
-
+	boost::thread t1(stream.get_keyboard_input);
+/*
 	boost::thread t2(boost::bind(&stream::get_keyboard_input, &keyboard_stream));
-	t2.join();
+	t2.join();*/
 
 		//mysub.on_next = []() { cout << "lol " << endl; };
 /*
