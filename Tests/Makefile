@@ -17,7 +17,7 @@ rc.o: rc.h rc.cpp
 	$(CC) $(CFLAGS) -c -o rc.o rc.cpp
 
 helloworld2: helloworld2.cpp rc.o
-	$(CC) $(CFLAGS) $(LDFLAGS) helloworld2.cpp rc.o -o helloworld2	
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) helloworld2.cpp rc.o -o helloworld2	
 
 .PHONY:
 clean:
