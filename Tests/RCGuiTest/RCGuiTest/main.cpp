@@ -14,11 +14,31 @@
 // method resourcePath() from ResourcePath.hpp
 //
 
-#include <SFML/Audio.hpp>
+//#include <SFML/Audio.hpp>
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
 #include <SFML/Graphics.hpp>
+#include <iostream>
+#include "rc.h"
 
 // Here is a small helper for you ! Have a look.
 #include "ResourcePath.hpp"
+
+// Factory method: returns a stream from keyboard input
+stream *stream::stream_from_keyboard_input() {
+    // Make a new stream
+    stream *new_stream = new stream;
+    
+    // Sets get_events_from_source() to read in from keyboard and notify observers when a new line is entered from keyboard
+    new_stream->get_events_from_source = [new_stream]() {
+        string keyinput;
+        cin >> keyinput;
+        new_stream->setChanged();
+        new_stream->notifySubscribers(keyinput);
+    };
+    return new_stream;
+}
+
 
 int main(int, char const**)
 {
@@ -48,14 +68,14 @@ int main(int, char const**)
     text.setColor(sf::Color::Black);
 
     // Load a music to play
-    sf::Music music;
-    if (!music.openFromFile(resourcePath() + "nice_music.ogg")) {
-        return EXIT_FAILURE;
-    }
-
-    // Play the music
-    music.play();
-
+//    sf::Music music;
+//    if (!music.openFromFile(resourcePath() + "nice_music.ogg")) {
+//        return EXIT_FAILURE;
+//    }
+//
+//    // Play the music
+//    music.play();
+//
     // Start the game loop
     while (window.isOpen())
     {
