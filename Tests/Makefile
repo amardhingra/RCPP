@@ -8,7 +8,7 @@ default: helloworld
 
 debug: CXXFLAGS += -DDEBUG -g
 debug: CCFLAGS += -DDEBUG -g
-debug: all
+debug: clean helloworld
 
 helloworld: helloworld.cpp
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) helloworld.cpp -o helloworld
