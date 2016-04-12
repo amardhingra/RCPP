@@ -38,6 +38,11 @@ http://www.boost.org/doc/libs/1_43_0/doc/html/signals2.html
 boost::thread
 http://www.boost.org/doc/libs/1_60_0/doc/html/thread/thread_management.html#thread.thread_management.tutorial
 
+twitter streams
+https://dev.twitter.com/streaming/overview/connecting
+ 
+mta service real time feed (updated every minute)
+ http://web.mta.info/status/serviceStatus.txt
 */
 
 /*
@@ -58,7 +63,7 @@ Notes:
 
 using namespace std;
 
-// Assumptions: streams are immutable, but can be mirrored
+// Assumptions: streams are immutable, but can be copied
 // Putting all classes in this one file for testing purposes only
 
 /*
@@ -170,7 +175,6 @@ stream *stream::stream_from_keyboard_input() {
         new_stream->notifySubscribers(keyinput);
     };
     return new_stream;
-
 }
 
 // Sets up a stream from the keyboard input. Adds 2 subscribers: the first will echo your input back at you, the second will tell you if what you entered is longer than 2 characters.
