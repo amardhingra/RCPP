@@ -6,6 +6,11 @@ Written by
 * Iris Zhang   - iz2140@columbia.edu
 * Julie Chien  - yc2937@columbia.edu
 
+### Thoughts
+* represent streams as trees, where a stream can have an unlimited number of children, and each of the child streams knows its parent. So if we have stream A (incoming tweets) and stream B (incoming tweets that are longer than 100 chars), then B can be represented as a child of A. lazily evaluate
+* define a source and its relationship with a stream more clearly
+* how to integrate data propagation?
+* events in a stream should be typed. But they should be able to be of many types (error types, completion types, strings, other event types). How? Maybe something like the SomeType thing from functional languages
  
 ### References
 
@@ -32,7 +37,7 @@ Microsoft's System.Reactive.Linq
 * https://msdn.microsoft.com/en-us/library/system.reactive.linq.observable(v=vs.103).aspx 
 
 MetaRx
-* https://github.com/MetaStack-pl/MetaRx/blob/master/manual/reactive-programming.md
+* https://github.com/MetaStack-pl/MetaRx/blob/master/manual/
 
 StackOverflow: How to implement IObservable<T>:
 * http://stackoverflow.com/questions/1768974/implementing-iobservablet-from-scratch
