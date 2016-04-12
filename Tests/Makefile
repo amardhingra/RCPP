@@ -13,9 +13,15 @@ debug: clean helloworld
 helloworld: helloworld.cpp
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) helloworld.cpp -o helloworld
 
+rc.o: rc.h rc.cpp
+	$(CC) $(CFLAGS) -c -o rc.o rc.cpp
+
+helloworld2: helloworld2.cpp rc.o
+	$(CC) $(CFLAGS) $(LDFLAGS) helloworld2.cpp rc.o -o helloworld2	
+
 .PHONY:
 clean:
-	rm -f *~ *.o helloworld a.out
+	rm -f *~ *.o helloworld2 helloworld a.out
 
 .PHONY:
 all: clean default
