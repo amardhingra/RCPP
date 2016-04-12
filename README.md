@@ -10,7 +10,7 @@ Written by
 ### References
 
 Wikipedia for "Observer Pattern"
-https://en.wikipedia.org/wiki/Observer_pattern
+* https://en.wikipedia.org/wiki/Observer_pattern
 
 Java SE7 Observable API
 * https://docs.oracle.com/javase/7/docs/api/java/util/Observable.html
