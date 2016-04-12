@@ -13,6 +13,7 @@
 		0309723E1CBD9490003385B3 /* nice_music.ogg in Resources */ = {isa = PBXBuildFile; fileRef = 0309723D1CBD9490003385B3 /* nice_music.ogg */; };
 		030972401CBD9490003385B3 /* sansation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0309723F1CBD9490003385B3 /* sansation.ttf */; };
 		030972421CBD9490003385B3 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 030972411CBD9490003385B3 /* icon.png */; };
+		0309724D1CBD9842003385B3 /* rc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0309724B1CBD9842003385B3 /* rc.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +26,8 @@
 		0309723D1CBD9490003385B3 /* nice_music.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; path = nice_music.ogg; sourceTree = "<group>"; };
 		0309723F1CBD9490003385B3 /* sansation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sansation.ttf; sourceTree = "<group>"; };
 		030972411CBD9490003385B3 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
+		0309724B1CBD9842003385B3 /* rc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rc.cpp; sourceTree = "<group>"; };
+		0309724C1CBD9842003385B3 /* rc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rc.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +60,8 @@
 		030972321CBD9490003385B3 /* RCGuiTest */ = {
 			isa = PBXGroup;
 			children = (
+				0309724B1CBD9842003385B3 /* rc.cpp */,
+				0309724C1CBD9842003385B3 /* rc.h */,
 				030972351CBD9490003385B3 /* ResourcePath.mm */,
 				030972371CBD9490003385B3 /* ResourcePath.hpp */,
 				030972381CBD9490003385B3 /* main.cpp */,
@@ -173,6 +178,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				030972391CBD9490003385B3 /* main.cpp in Sources */,
+				0309724D1CBD9842003385B3 /* rc.cpp in Sources */,
 				030972361CBD9490003385B3 /* ResourcePath.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -277,8 +283,16 @@
 		030972461CBD9490003385B3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include/,
+					/usr/local/Cellar/boost/1.60.0_1/include/,
+				);
 				INFOPLIST_FILE = "RCGuiTest/RCGuiTest-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib/,
+					/usr/local/Cellar/boost/1.60.0_1/lib/,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -286,8 +300,16 @@
 		030972471CBD9490003385B3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include/,
+					/usr/local/Cellar/boost/1.60.0_1/include/,
+				);
 				INFOPLIST_FILE = "RCGuiTest/RCGuiTest-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib/,
+					/usr/local/Cellar/boost/1.60.0_1/lib/,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
