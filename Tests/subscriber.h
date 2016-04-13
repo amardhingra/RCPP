@@ -42,7 +42,8 @@ public:
         subscriber_event(int _i) : type(message_type::INT), data(_i) {};
         subscriber_event(float _f) : type(message_type::FLOAT), data(_f) {};
         subscriber_event(std::string _s) : type(message_type::STR), data(_s) {};
-    
+
+    public:
         message_type get_type() { return type; }
         bool         get_b() { return data.b; }
         int          get_i() { return data.i; }
@@ -59,6 +60,10 @@ public:
 
 
     public:
+        static void simple_on_next(subscriber_pool::subscriber_event n){
+            // TODO: define behavior for simple next handler
+        }
+
         static void simple_on_error(std::exception e){
             // TODO: define behavior for simple error handler
         }

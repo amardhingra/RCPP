@@ -56,7 +56,7 @@ Notes:
 #include <exception>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
-
+#include "subscriber.h"
 // thread-safe signal handling, used for the notification system
 // Not currently used but will probably be useful later
 // #include <boost/signals2.hpp> 
@@ -177,8 +177,21 @@ stream *stream::stream_from_keyboard_input() {
     return new_stream;
 }
 
+void func(){
+
+}
+
+void func_e(std::exception e){
+
+}
+
+void func_n(subscriber_pool::subscriber_event e){
+
+}
+
 // Sets up a stream from the keyboard input. Adds 2 subscribers: the first will echo your input back at you, the second will tell you if what you entered is longer than 2 characters.
 int main() {
+    subscriber_pool::subscriber s(nullptr, func_e, func);
 
     // Create a new stream that reads in from keyboard
     stream *keyboard_stream = stream::stream_from_keyboard_input();
