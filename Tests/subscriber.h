@@ -110,6 +110,7 @@ public:
     }
 
 public:
+    subscriber(){};
     // constructor only requires an on_next function
     subscriber(
         std::function<void(subscriber_event)> next,

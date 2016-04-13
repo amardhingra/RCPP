@@ -41,19 +41,28 @@ void subscriber_pool::handle_event(){
 
             // exit on flag
             if(end){
-                std::cout << "thread exiting" << std::endl;
                 lk.unlock();
                 return;
             }
         }
 
         // get event from queue and remove it from queue
+        if(events.size() == 0)
+            continue;
+
         struct event ev = events.front();
         events.pop_front();
         lk.unlock();
 
         // call the on_next function for the corresponding subscriber
-        subscribers.at(ev.s_id).on_next(ev.s_event);
+        subscriber sub;
+        while(!sub_lock.try_lock());
+        if(subscribers.count(ev.s_id) == 1)
+            sub = subscribers.at(ev.s_id);
+        sub_lock.unlock();
+
+        if(sub.on_error != nullptr)
+            sub.on_next(ev.s_event);
     }
 }
 
@@ -73,13 +82,19 @@ void subscriber_pool::notify(sub_id id, subscriber_event event){
 
 
 void subscriber_pool::error(sub_id id, std::exception e){
-    subscribers.at(id).on_error(e);
+    subscriber sub;
+    while(!sub_lock.try_lock());
+    if(subscribers.count(id) == 1)
+        sub = subscribers.at(id);
+    sub_lock.unlock();
+    if(sub.on_error != nullptr)
+        sub.on_error(e);
 }
 
 
 void subscriber_pool::complete(sub_id id){
-    
     // lock the subscriber pool
+    while(!e_lock.try_lock());
     while(!sub_lock.try_lock());
 
     // get and delete the subscriber
@@ -88,6 +103,7 @@ void subscriber_pool::complete(sub_id id){
 
     // unlock the subscriber pool
     sub_lock.unlock();
+    e_lock.unlock();
     // call the subscribers on_complete function
     sub.on_completed();
 }
@@ -126,11 +142,9 @@ subscriber_pool::~subscriber_pool(){
     end = true;
     lk.unlock();
 
-    // wake up all worker threads
-    e_cond.notify_all();
-
     // join all worker threads
     for(auto& t : pool){
+        e_cond.notify_all();
         t.join();
     }
 }
@@ -161,7 +175,7 @@ void func4(subscriber_event event){
 
 int main(void){
     using namespace std;
-    subscriber_pool pool(4);
+    subscriber_pool pool(2);
     subscriber s1(func1);
     subscriber s2(func2);
     subscriber s3(func3);
