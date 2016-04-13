@@ -88,7 +88,6 @@ public:
 
     subscriber(subscriber &sub) :
         on_next(sub.on_next), on_error(sub.on_error), on_completed(sub.on_completed) {};
-
 };
 
 
