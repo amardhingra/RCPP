@@ -33,11 +33,11 @@ subscriber_event::subscriber_event(const subscriber_event& event){
 void subscriber_pool::handle_event(){
     while(true){
         // acquire lock
-        std::unique_lock<std::mutex> lk(lock);
+        std::unique_lock<std::mutex> lk(e_lock);
         
         // wait until told to exit or while queue is empty
         while(!end && events.size() == 0){
-            cond.wait(lk);
+            e_cond.wait(lk);
 
             // exit on flag
             if(end){
@@ -63,19 +63,47 @@ void subscriber_pool::notify(sub_id id, subscriber_event event){
     struct event ev(id, event);
 
     // lock the queue and add the event to it
-    std::unique_lock<std::mutex> lk(lock);
+    std::unique_lock<std::mutex> lk(e_lock);
     events.push_back(ev);
     lk.unlock();
 
     // wake up any worker threads
-    cond.notify_all();
+    e_cond.notify_all();
+}
+
+
+void subscriber_pool::error(sub_id id, std::exception e){
+    subscribers.at(id).on_error(e);
+}
+
+
+void subscriber_pool::complete(sub_id id){
+    
+    // lock the subscriber pool
+    while(!sub_lock.try_lock());
+
+    // get and delete the subscriber
+    subscriber sub = subscribers.at(id);
+    subscribers.erase(id);
+
+    // unlock the subscriber pool
+    sub_lock.unlock();
+    // call the subscribers on_complete function
+    sub.on_completed();
 }
 
 
 sub_id subscriber_pool::register_subscriber(subscriber &sub) {
+    
+    // lock the subscriber pool
+    while(!sub_lock.try_lock());
+    
     // add the subscriber to the map
     subscribers.insert(std::pair<sub_id, subscriber&>(id, sub));
     
+    // unlock the subscriber pool
+    sub_lock.unlock();
+
     // increment and return the counter
     return id++;
 }
@@ -94,12 +122,12 @@ subscriber_pool::subscriber_pool(int concurrency){
 
 subscriber_pool::~subscriber_pool(){
     // set the end flag
-    std::unique_lock<std::mutex> lk(lock);
+    std::unique_lock<std::mutex> lk(e_lock);
     end = true;
     lk.unlock();
 
     // wake up all worker threads
-    cond.notify_all();
+    e_cond.notify_all();
 
     // join all worker threads
     for(auto& t : pool){
@@ -113,7 +141,6 @@ subscriber_pool::~subscriber_pool(){
  */
 void func1(subscriber_event event){
     using namespace std;
-    std::this_thread::sleep_for (std::chrono::seconds(1));
     cout << "func 1" << endl;
 }
 
@@ -148,5 +175,8 @@ int main(void){
     pool.notify(0,1);
     pool.notify(0,1);
     std::this_thread::sleep_for(std::chrono::seconds(1));
+    for(int i = 0; i < 4; i++){
+        pool.complete(i);
+    }
     return 0;
 }

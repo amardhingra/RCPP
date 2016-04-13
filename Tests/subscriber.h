@@ -145,8 +145,9 @@ private:
     sub_id                                 id = 0; // used for sequentially registering subscribers with unique ids
     std::map<sub_id, subscriber&>          subscribers; // maintains a map of subscribers for fast lookup
     std::list<event>                       events; // list of events to be processed
-    std::mutex                             lock; // used to syncronize access to list
-    std::condition_variable                cond; // used to let worker threads sleep
+    std::mutex                             e_lock; // used to syncronize access to list
+    std::condition_variable                e_cond; // used to let worker threads sleep
+    std::mutex                             sub_lock; // used to synchronize access to the subscriber map
     std::vector<std::thread>               pool; // maintains a list of runnning threads
 
     // function passed to threads to handle subscriber_events
@@ -161,8 +162,15 @@ public:
     // called to pass a new subscriber_event to subscriber given by sub_id
     void notify(sub_id id, subscriber_event event);
 
+    // used to notify a subscriber when a stream encounters an exception
+    void error(sub_id id, std::exception e);
+
+    // used to notify a subscriber that a stream has ended
+    void complete(sub_id id);
+
     // used to register a subscriber with the burrent subscriber_pool
     sub_id register_subscriber(subscriber& sub);
+
 };
 
 #endif
