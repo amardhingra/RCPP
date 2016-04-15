@@ -13,15 +13,23 @@ debug: clean helloworld
 helloworld: helloworld.cpp
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) helloworld.cpp -o helloworld
 
+
 rc.o: rc.h rc.cpp
 	$(CC) $(CFLAGS) -c -o rc.o rc.cpp
+
+subscriber: subscriber.o
+	$(CXX) $(LDFLAGS) subscriber.o -o subscriber
+
+subscriber.o: subscriber.cpp subscriber.h
+	$(CXX) $(CXXFLAGS) subscriber.cpp -c
+
 
 helloworld2: helloworld2.cpp rc.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) helloworld2.cpp rc.o -o helloworld2	
 
 .PHONY:
 clean:
-	rm -f *~ *.o helloworld2 helloworld a.out
+	rm -f *~ *.o helloworld2 helloworld a.out subscriber
 
 .PHONY:
 all: clean default
