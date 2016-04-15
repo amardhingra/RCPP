@@ -1,11 +1,15 @@
 #include "subscriber.h"
 
+typedef unsigned long stream_id;
 /*
    A stream emits data for subscribers to the stream to handle.
    A stream can have many subscribers.
    */
+
+ 
 class stream {
 
+	stream_id id;
     bool changed = false;
     // The threadpool that is assigned to this stream. If none are specified then it gets initialized??
     //seems like there would be ownership problems with this model

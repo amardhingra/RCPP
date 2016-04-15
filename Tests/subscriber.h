@@ -13,7 +13,7 @@
 #include <iostream>
 
 typedef unsigned long sub_id;
-
+typedef unsigned long stream_id;
 /*
  * Subscriber Event
  * Defines a class that allows a stream to pass an event
@@ -83,6 +83,7 @@ public:
  * deal with errors and handle stream termination
  */
 class subscriber {
+    sub_id id;
 
 public:
     // function that is called when the stream generates new data
@@ -162,6 +163,9 @@ public:
 
     // called to pass a new subscriber_event to subscriber given by sub_id
     void notify(sub_id id, subscriber_event event);
+    void notify_stream(stream_id id, subscriber_event event) {
+    
+}
 
     // used to notify a subscriber when a stream encounters an exception
     void error(sub_id id, std::exception e);
