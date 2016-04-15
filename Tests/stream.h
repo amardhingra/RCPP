@@ -9,7 +9,7 @@ class stream {
     bool changed = false;
     // The threadpool that is assigned to this stream. If none are specified then it gets initialized??
     //seems like there would be ownership problems with this model
-    subscriber_pool *threadpool; 
+    subscriber_pool *thread_pool; 
 
     private:
     void setChanged();
@@ -21,8 +21,9 @@ class stream {
 
     public:
     stream(); //default constructor, will eventually take from a source. 
-    stream(subscriber_pool some_pool); //you can specify a specific subscriber_pool 
-
+    stream(subscriber_pool& some_pool); //you can specify a specific subscriber_pool 
+	~stream(); 
+    
     // Factory method: returns a stream from keyboard input
     static stream *stream_from_keyboard_input();
 
