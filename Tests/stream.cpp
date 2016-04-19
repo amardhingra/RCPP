@@ -37,7 +37,7 @@ void stream::register_subscriber(std::vector<subscriber> new_subscribers){
 // If the stream has changed, then notify all its subscribers and clear the "changed" variable to indicate that the stream has no longer changed
 
 //TODO: THIS IS WRONG. IT NOTIFIES ALL SUBSCRIBERS IN ITS POOL
-void stream::notifySubscribers(event new_event) {
+void stream::notify_subscribers(event new_event) {
     if (this->has_changed()) {
         auto pool_subscribers = thread_pool->pool;
         for (subscriber pool_subscriber : pool_subscribers)
