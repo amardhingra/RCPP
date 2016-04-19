@@ -6,11 +6,12 @@ typedef unsigned long stream_id;
    A stream can have many subscribers.
    */
 
- 
 class stream {
+    //initially set to 0
+	stream_id id=0; 
 
-	stream_id id;
     bool changed = false;
+
     // The threadpool that is assigned to this stream. If none are specified then it gets initialized??
     //seems like there would be ownership problems with this model
     subscriber_pool *thread_pool; 
@@ -41,7 +42,7 @@ class stream {
     void register_subscriber(std::vector<subscriber> subscribers);
 
     // If the stream has changed, then notify all subscribers and clear the "changed" variable to indicate that the stream has no longer changed
-    void notifySubscribers(event new_event);
+    void notify_subscribers(event new_event);
 
     // Starts the stream;
     void start();

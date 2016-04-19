@@ -29,8 +29,9 @@ int main(void){
     subscriber s3(func3);
     subscriber s4(func4);
 
-    vector slist = {s1, s2, s3, s4};   
-   new_stream.register_subscribers(slist); 
+    vector<subscriber> slist = {s1, s2, s3, s4};   
+   new_stream.register_subscriber(slist); 
+   keyboard_stream.start();
 
 
    //source.register_subscriber(new subscriber(function whatever))
