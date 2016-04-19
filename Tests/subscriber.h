@@ -83,7 +83,7 @@ public:
  * deal with errors and handle stream termination
  */
 class subscriber {
-    sub_id id;
+    //sub_id id;
 
 public:
     // unique identifier for subscriber

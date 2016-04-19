@@ -27,6 +27,16 @@ subscriber.o: subscriber.cpp subscriber.h
 helloworld2: helloworld2.cpp rc.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) helloworld2.cpp rc.o -o helloworld2	
 
+stream.o: stream.cpp stream.h 
+	$(CXX) $(CXXFLAGS) stream.cpp -c
+
+test: test.o stream.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o test
+
+test.o: test.cpp stream.h 
+	$(CXX) $(CXXFLAGS) test.cpp -c
+
+
 .PHONY:
 clean:
 	rm -f *~ *.o helloworld2 helloworld a.out subscriber
