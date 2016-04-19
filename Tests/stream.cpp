@@ -8,15 +8,15 @@ stream::stream(){
     thread_pool = subscriber_pool pool(2);
 }
 
-void stream::setChanged() {
+void stream::set_changed() {
     changed = true;
 }
 
-void stream::clearChanged() {
+void stream::clear_changed() {
     changed = false;
 }
 
-bool stream::hasChanged() {
+bool stream::has_changed() {
     return changed;
 }
 
@@ -38,11 +38,11 @@ void stream::register_subscriber(std::vector<subscriber> new_subscribers){
 
 //TODO: THIS IS WRONG. IT NOTIFIES ALL SUBSCRIBERS IN ITS POOL
 void stream::notifySubscribers(event new_event) {
-    if (this->hasChanged()) {
+    if (this->has_changed()) {
         auto pool_subscribers = thread_pool->pool;
         for (subscriber pool_subscriber : pool_subscribers)
             pool_subscribers.notify(new_event);
-        clearChanged();
+        clear_changed();
     }
 }
 
@@ -50,18 +50,6 @@ void stream::notifySubscribers(event new_event) {
 void stream::start() {
     while(true) {
         get_events_from_source();
-    }
-}
-
-// Test function that 
-void stream::get_keyboard_input() {
-    while(true) {
-
-        string keyinput;
-        cin >> keyinput;
-
-        setChanged();
-        notifySubscribers(keyinput);
     }
 }
 
@@ -73,7 +61,7 @@ stream *stream::stream_from_keyboard_input() {
     new_stream->get_events_from_source = [new_stream]() {   
         string keyinput;
         cin >> keyinput; 
-        new_stream->setChanged();
+        new_stream->set_changed();
         new_stream->notifySubscribers(keyinput);
     };
     return new_stream;
