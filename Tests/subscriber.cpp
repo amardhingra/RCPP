@@ -1,3 +1,4 @@
+
 #include "subscriber.h"
 
 #include <iostream>
@@ -182,8 +183,8 @@ int main(void){
     subscriber s1(func1);
     subscriber s2(func2);
     subscriber s3(func3);
-    subscriber s4(func4);
-    pool.register_subscriber(s1);
+    subscriber s4(func4);å
+    pool.register_subscriber(subscriber(func1));
     pool.register_subscriber(s2);
     pool.register_subscriber(s3);
     pool.register_subscriber(s4);

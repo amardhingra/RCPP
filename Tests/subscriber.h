@@ -86,6 +86,8 @@ class subscriber {
     sub_id id;
 
 public:
+    // unique identifier for subscriber
+    sub_id id;
     // function that is called when the stream generates new data
     std::function<void(subscriber_event)> on_next;
 
@@ -163,9 +165,8 @@ public:
 
     // called to pass a new subscriber_event to subscriber given by sub_id
     void notify(sub_id id, subscriber_event event);
-    void notify_stream(stream_id id, subscriber_event event) {
-    
-}
+    void notify(std::vector<sub_id>& ids, subscriber_event event);
+    void notify_stream(stream_id str_id, subscriber_event event);
 
     // used to notify a subscriber when a stream encounters an exception
     void error(sub_id id, std::exception e);
@@ -175,6 +176,7 @@ public:
 
     // used to register a subscriber with the burrent subscriber_pool
     sub_id register_subscriber(subscriber& sub);
+    sub_id register_subscriber(subscriber& sub, stream_id id);
 
 };
 
