@@ -17,25 +17,23 @@ class stream {
     subscriber_pool *thread_pool; 
 
     private:
-    void setChanged();
+    void set_changed();
 
-    void clearChanged();
+    void clear_changed();
 
-    bool hasChanged();
+    bool has_changed();
 
 
     public:
     stream(); //default constructor, will eventually take from a source. 
-    stream(subscriber_pool& some_pool); //you can specify a specific subscriber_pool 
+    stream(subscriber_pool* some_pool); //you can specify a specific subscriber_pool 
 	~stream(); 
     
     // Factory method: returns a stream from keyboard input
-    static stream *stream_from_keyboard_input();
+    static stream *stream_from_keyboard_input(subscriber_pool* pool);
 
     // A function that gets events and notifies subscribers accordingly
     std::function<void()> get_events_from_source;
-
-    
 
     // Add a new subscriber to this stream
     void register_subscriber(subscriber new_subscriber);
