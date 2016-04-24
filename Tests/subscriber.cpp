@@ -34,20 +34,20 @@ subscriber_event::subscriber_event(const subscriber_event& event){
 /**
  * Methods and variable declarations for the SUBSCRIBER class
  **/
-template <typename T>
+template <class T>
 sub_id subscriber<T>::usub_id;
 
-template <typename T>
+template <class T>
 void subscriber<T>::simple_on_next(event<T> n) {
     // TODO: define behavior for simple next handler
 }
 
-template <typename T>
+template <class T>
 void subscriber<T>::simple_on_error(std::exception e){
     // TODO: define behavior for simple error handler
 }
 
-template <typename T>
+template <class T>
 void subscriber<T>::simple_on_completed(){
     // TODO: define behavior for simple completed handler
     // behaviour should include removing the stream from the stream map
@@ -62,20 +62,20 @@ subscriber<T>::subscriber(std::function<void(event<T>)> next,
     on_completed(completed), 
     id(usub_id++) {}
 
-template <typename T>
+template <class T>
 subscriber<T>::subscriber(const subscriber<T> &sub) :
     on_next(sub.on_next), 
     on_error(sub.on_error), 
     on_completed(sub.on_completed),
     id(usub_id++) {}
 
-template <typename T>
+template <class T>
 subscriber<T>& subscriber<T>::operator=(subscriber<T> &sub){
     return sub;
 }
 
 // move constructor
-template <typename T>
+template <class T>
 subscriber<T>::subscriber(subscriber<T> &&sub) :
     on_next(sub.on_next), 
     on_error(sub.on_error), 
@@ -94,7 +94,7 @@ subscriber<T>::subscriber(subscriber<T> &&sub) :
  */
 
 // worker thread function for the subscriber_pool class
-template <typename T>
+template <class T>
 void subscriber_pool<T>::handle_event(){
     while(true){
         // acquire lock
@@ -138,7 +138,7 @@ void subscriber_pool<T>::handle_event(){
     }
 }
 
-template <typename T>
+template <class T>
 void subscriber_pool<T>::notify(sub_id id, event<T> event){
 
     // create an event to add to the queue
@@ -153,21 +153,21 @@ void subscriber_pool<T>::notify(sub_id id, event<T> event){
     e_cond.notify_all();
 }
 
-template <typename T>
+template <class T>
 void subscriber_pool<T>::notify_all(std::vector<sub_id>& ids, event<T> event){
     for(auto id : ids){
         notify(id, event);
     }
 }
 
-template <typename T>
+template <class T>
 void subscriber_pool<T>::notify_stream(stream_id str_id, event<T> event){
     for(auto id : stream_subs.at(str_id)){
         notify(id, event);
     }
 }
 
-template <typename T>
+template <class T>
 void subscriber_pool<T>::error(sub_id id, std::exception e){
     while(!sub_lock.try_lock());
     if(subscribers.count(id) == 0){
@@ -179,7 +179,7 @@ void subscriber_pool<T>::error(sub_id id, std::exception e){
     sub.on_error(e);
 }
 
-template <typename T>
+template <class T>
 void subscriber_pool<T>::complete(sub_id id){
     // lock the subscriber pool
     while(!e_lock.try_lock());
@@ -196,7 +196,7 @@ void subscriber_pool<T>::complete(sub_id id){
     sub.on_completed();
 }
 
-template <typename T>
+template <class T>
 void subscriber_pool<T>::register_subscriber(subscriber<T> sub) {
     
     // lock the subscriber pool
@@ -209,7 +209,7 @@ void subscriber_pool<T>::register_subscriber(subscriber<T> sub) {
     sub_lock.unlock();
 }
 
-template <typename T>
+template <class T>
 void subscriber_pool<T>::register_subscriber(subscriber<T> sub, stream_id id){
 
     // lock the subscriber pool
@@ -223,7 +223,7 @@ void subscriber_pool<T>::register_subscriber(subscriber<T> sub, stream_id id){
     sub_lock.unlock();
 }
 
-template <typename T>
+template <class T>
 subscriber_pool<T>::subscriber_pool(int concurrency){
     // never make more than 16 threads
     int max = concurrency > 16 ? 16 : concurrency;
@@ -234,7 +234,7 @@ subscriber_pool<T>::subscriber_pool(int concurrency){
     }
 }
 
-template <typename T>
+template <class T>
 subscriber_pool<T>::~subscriber_pool(){
     // set the end flag
     std::unique_lock<std::mutex> lk(e_lock);
