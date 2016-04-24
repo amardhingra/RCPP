@@ -167,7 +167,13 @@ private:
             sub.on_next(ev.s_event);
         }
     };
-    void grow();
+
+    void grow(){
+        auto size = subscribers.size();
+        if(pool.size() < MAX_SUB_THREADS && ((float) subscribers.size()) / pool.size() >= 4){
+            pool.push_back(std::thread(&subscriber_pool<T>::handle_event, this));
+        }
+    };
 public:
 
     // constructor with default concurrency level set to 1

@@ -26,4 +26,4 @@ public:
 
 }; // end subscriber_event
 
-#endif 
+#endif
