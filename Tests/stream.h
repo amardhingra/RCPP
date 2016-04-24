@@ -25,18 +25,34 @@ class stream {
     subscriber_pool<T> *thread_pool; 
 
     public:
-    void change();
+    void change(){
+        changed = true;
+    };
 
-    void clear_changed();
+    void clear_changed(){
+        changed = false;
+    };
 
-    bool has_changed();
+    bool has_changed(){
+        return changed;
+    };
 
 
     public:
-    stream(); //default constructor, will eventually take from a source. 
+    //default constructor, will eventually take from a source. 
+    stream(){
+        subscriber_pool<T> pool(2);
+        thread_pool = &pool;
+        id++;
+    }; 
 
-    stream(subscriber_pool<T>* some_pool); //you can specify a specific subscriber_pool 
-	~stream(); 
+    //you can specify a specific subscriber_pool
+    stream(subscriber_pool<T>* some_pool) {
+        thread_pool = some_pool; 
+        id++;
+    };  
+    
+	~stream(){}; 
     
     // Factory method: returns a stream from keyboard input
     //static stream *stream_from_keyboard_input(subscriber_pool* pool);
@@ -45,15 +61,32 @@ class stream {
     std::function<void()> get_events_from_source;
 
     // Add a new subscriber to this stream
-    void register_subscriber(subscriber<T> new_subscriber);
-    void register_subscriber(std::vector<subscriber<T>> subscribers);
+    void register_subscriber(subscriber<T> new_subscriber){
+        thread_pool->register_subscriber(new_subscriber, id);
+    };
+    void register_subscriber(std::vector<subscriber<T>> subscribers){
+        for (subscriber<T> new_subscriber : new_subscribers )
+            thread_pool->register_subscriber(new_subscriber, id);
+    };
 
     // If the stream has changed, then notify all subscribers and clear the "changed" variable to indicate that the stream has no longer changed
     //template<class T> 
-    void notify_subscribers(event<T> new_event);
+    void notify_subscribers(event<T> new_event){
+         if (this->has_changed()) {
+        // auto pool_subscribers = thread_pool->pool;
+        // for (subscriber pool_subscriber : pool_subscribers)
+        //     pool_subscribers.notify(new_event);
+            thread_pool->notify_stream(id, new_event);
+            clear_changed();
+        }
+    };
 
     // Starts the stream;
-    void start();
+    void start(){
+        while(true) {
+            get_events_from_source();
+        }
+    };
 
     // Test function that 
     void get_keyboard_input(); 
