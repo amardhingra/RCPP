@@ -274,6 +274,7 @@ void func4(event<int> event){
     cout << "func 4" << endl;
 }
 
+#ifndef MAIN
 int main(void){
     using namespace std;
     subscriber_pool<int> pool(2);
@@ -289,3 +290,4 @@ int main(void){
     }
     return 0;
 }
+#endif

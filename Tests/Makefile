@@ -30,6 +30,8 @@ helloworld2: helloworld2.cpp rc.o
 stream.o: stream.cpp stream.h 
 	$(CXX) $(CXXFLAGS) stream.cpp -c
 
+test: CXXFLAGS += -DMAIN
+test: CCFLAGS += -DMAIN
 test: test.o stream.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o test
 
