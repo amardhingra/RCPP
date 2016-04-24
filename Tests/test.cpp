@@ -1,5 +1,6 @@
 #include "stream.h"
-//#include "event.h"
+#include "event.h"
+#include "subscriber.h"
 
 void func1(event<std::string> event){
     using namespace std;

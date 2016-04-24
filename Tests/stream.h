@@ -1,3 +1,6 @@
+#ifndef INCLUDED_STREAM
+#define INCLUDED_STREAM
+
 #include "subscriber.h"
 #include "event.h"
 
@@ -56,3 +59,5 @@ class stream {
     void get_keyboard_input(); 
 
 };
+
+#endif

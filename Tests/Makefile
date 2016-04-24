@@ -27,11 +27,11 @@ subscriber.o: subscriber.cpp subscriber.h
 helloworld2: helloworld2.cpp rc.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) helloworld2.cpp rc.o -o helloworld2	
 
-stream.o: stream.cpp stream.h 
+stream.o: stream.cpp stream.h event.h
 	$(CXX) $(CXXFLAGS) stream.cpp -c
 
-test: CXXFLAGS += -DMAIN
-test: CCFLAGS += -DMAIN
+#test: CXXFLAGS += -DMAIN
+#test: CCFLAGS += -DMAIN
 test: test.o stream.o subscriber.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o test
 
@@ -41,7 +41,7 @@ test.o: test.cpp stream.h
 
 .PHONY:
 clean:
-	rm -f *~ *.o helloworld2 helloworld a.out subscriber
+	rm -f *~ *.o helloworld2 helloworld a.out subscriber test
 
 .PHONY:
 all: clean default
