@@ -46,7 +46,7 @@ int main(void){
 
     vector<subscriber<string>> slist = {s1, s2, s3, s4};   
     keyboard_stream.register_subscriber(slist); 
-    keyboard_stream.start();
+    //keyboard_stream.start();
 } catch(std::exception &e){
     std::cout << e.what() << std::endl;
 }
