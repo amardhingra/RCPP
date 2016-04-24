@@ -15,9 +15,10 @@
 #include "event.h"
 // #include "stream.h"
 
+#define MAX_SUB_THREADS 16
+
 typedef unsigned long sub_id;
 typedef unsigned long stream_id;
-
 
 /*
  * Subscriber
@@ -98,6 +99,7 @@ private:
 
     // function passed to threads to handle subscriber_events
     void handle_event();
+    void grow();
 public:
 
     // constructor with default concurrency level set to 1

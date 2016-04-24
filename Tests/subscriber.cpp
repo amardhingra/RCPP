@@ -3,33 +3,6 @@
 #include <iostream>
 #include <chrono>
 
-/**
- * Methods and variable declarations for the SUBSCRIBER_EVENT class
- **/
-
-
-//copy constructor for subscriber_event
-subscriber_event::subscriber_event(const subscriber_event& event){
-    // copy type
-    type = event.type;
-
-    // copy correct variable from data
-    switch(type){
-        case message_type::BOOL:
-            data.b = event.data.b;
-            break;
-        case message_type::INT:
-            data.i = event.data.i;
-            break;
-        case message_type::FLOAT:
-            data.f = event.data.f;
-            break;
-        case message_type::STR:
-            data.s = event.data.s;
-            break;
-    }
-}
-
 
 /**
  * Methods and variable declarations for the SUBSCRIBER class
@@ -194,6 +167,15 @@ void subscriber_pool<T>::complete(sub_id id){
     e_lock.unlock();
     // call the subscribers on_complete function
     sub.on_completed();
+
+}
+
+template <class T>
+void subscriber_pool<T>::grow(){
+    auto size = subscribers.size();
+    if(pool.size() < MAX_SUB_THREADS && ((float) subscribers.size()) / pool.size() >= 4){
+        pool.push_back(std::thread(&subscriber_pool<T>::handle_event, this));
+    }
 }
 
 template <class T>
@@ -207,6 +189,8 @@ void subscriber_pool<T>::register_subscriber(subscriber<T> sub) {
     
     // unlock the subscriber pool
     sub_lock.unlock();
+
+    grow();
 }
 
 template <class T>
@@ -221,12 +205,15 @@ void subscriber_pool<T>::register_subscriber(subscriber<T> sub, stream_id id){
 
     // unlock the subscriber pool
     sub_lock.unlock();
+
+    grow();
+
 }
 
 template <class T>
 subscriber_pool<T>::subscriber_pool(int concurrency){
     // never make more than 16 threads
-    int max = concurrency > 16 ? 16 : concurrency;
+    int max = concurrency > MAX_SUB_THREADS ? MAX_SUB_THREADS : concurrency;
 
     // create threads based on the concurrency requested
     for(int i = 0; i < max; i++){
@@ -277,10 +264,11 @@ void func4(event<int> event){
 #ifndef MAIN
 int main(void){
     using namespace std;
-    subscriber_pool<int> pool(2);
+    subscriber_pool<int> pool;
     pool.register_subscriber(subscriber<int>(func1), 0);
     pool.register_subscriber(subscriber<int>(func2), 0);
     pool.register_subscriber(subscriber<int>(func3), 1);
+    pool.register_subscriber(subscriber<int>(func4), 0);
     pool.register_subscriber(subscriber<int>(func4), 0);
     std::vector<sub_id> subs{0, 1, 2};
     pool.notify_all(subs, event<int>::event(1));
