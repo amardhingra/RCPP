@@ -23,7 +23,9 @@ void func4(subscriber_event event){
 int main(void){
     using namespace std;
     subscriber_pool pool(2);
-    stream *keyboard_stream = stream::stream_from_keyboard_input(pool);
+    //stream *keyboard_stream = stream::stream_from_keyboard_input(pool);
+    stream keyboard_stream(pool);
+    
 
     subscriber s1(func1); //subscribers specify the streams they subscribe to, get assigned unique id in that stream 
     subscriber s2(func2);

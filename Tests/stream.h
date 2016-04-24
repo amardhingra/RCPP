@@ -1,4 +1,5 @@
 #include "subscriber.h"
+#include "event.h"
 
 typedef unsigned long stream_id;
 /*
@@ -6,6 +7,10 @@ typedef unsigned long stream_id;
    A stream can have many subscribers.
    */
 
+//namespace {class subscriber_pool; }
+//namespace {class subscriber; }
+
+//template <typename T>
 class stream {
     //initially set to 0
 	stream_id id = 0; 
@@ -17,7 +22,7 @@ class stream {
     subscriber_pool *thread_pool; 
 
     private:
-    void set_changed();
+    void change();
 
     void clear_changed();
 
@@ -30,7 +35,7 @@ class stream {
 	~stream(); 
     
     // Factory method: returns a stream from keyboard input
-    static stream *stream_from_keyboard_input(subscriber_pool* pool);
+    //static stream *stream_from_keyboard_input(subscriber_pool* pool);
 
     // A function that gets events and notifies subscribers accordingly
     std::function<void()> get_events_from_source;
@@ -40,7 +45,8 @@ class stream {
     void register_subscriber(std::vector<subscriber> subscribers);
 
     // If the stream has changed, then notify all subscribers and clear the "changed" variable to indicate that the stream has no longer changed
-    void notify_subscribers(event new_event);
+    template<class T> 
+    void notify_subscribers(event<T> new_event);
 
     // Starts the stream;
     void start();
