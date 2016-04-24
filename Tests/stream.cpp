@@ -1,47 +1,50 @@
 #include "stream.h"
 
 template <typename T>
-stream::stream(subscriber_pool<T>* some_pool){
+stream<T>::stream(subscriber_pool<T>* some_pool){
     thread_pool = some_pool; 
     id++;
 }
 
 //create a threadpool with concurrency 2 if none exists
 template <typename T>
-stream::stream(){
+stream<T>::stream(){
     subscriber_pool<T> pool(2);
     thread_pool = &pool;
     id++;
 }
 
-void stream::change() {
+template <typename T>
+void stream<T>::change() {
     changed = true;
 }
 
-void stream::clear_changed() {
+template <typename T>
+void stream<T>::clear_changed() {
     changed = false;
 }
 
-bool stream::has_changed() {
+template <typename T>
+bool stream<T>::has_changed() {
     return changed;
 }
 
 // Add a single new subscriber
 template <typename T> 
-void stream::register_subscriber(subscriber<T> new_subscriber) {
+void stream<T>::register_subscriber(subscriber<T> new_subscriber) {
     thread_pool->register_subscriber(new_subscriber, id);
 }
 
 // Add a vector of new subscribers
 template <typename T>
-void stream::register_subscriber(std::vector<subscriber<T>> new_subscribers){
+void stream<T>::register_subscriber(std::vector<subscriber<T>> new_subscribers){
     for (subscriber<T> new_subscriber : new_subscribers )
         thread_pool->register_subscriber(new_subscriber, id);
 }
 
 // If the stream has changed, then notify all its subscribers and clear the "changed" variable to indicate that the stream has no longer changed
 template<class T> 
-void stream::notify_subscribers(event<T> new_event) {
+void stream<T>::notify_subscribers(event<T> new_event) {
     if (this->has_changed()) {
         // auto pool_subscribers = thread_pool->pool;
         // for (subscriber pool_subscriber : pool_subscribers)
@@ -71,7 +74,8 @@ void stream::notify_subscribers(event<T> new_event) {
 // }
 
 // Starts the stream; will continuously call get_events_from_source.
-void stream::start() {
+template <typename T>
+void stream<T>::start() {
     while(true) {
         get_events_from_source();
     }

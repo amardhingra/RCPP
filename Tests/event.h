@@ -1,3 +1,6 @@
+#ifndef INCLUDED_EVENT 
+#define INCLUDED_EVENT
+
 template <class T>
 
 class event {
@@ -22,3 +25,5 @@ public:
     // std::string  get_s() { return data.s; }
 
 }; // end subscriber_event
+
+#endif 
