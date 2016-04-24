@@ -116,6 +116,10 @@ public:
 
     // copy constructor
     subscriber(const subscriber &sub);
+    subscriber& operator=(subscriber &sub);
+
+    // move constructor
+    subscriber(subscriber &&sub);
 
 }; // end subscriber
 

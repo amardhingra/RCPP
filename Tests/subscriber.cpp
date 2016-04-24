@@ -62,7 +62,26 @@ subscriber::subscriber(std::function<void(subscriber_event)> next,
 subscriber::subscriber(const subscriber &sub) :
     on_next(sub.on_next), 
     on_error(sub.on_error), 
-    on_completed(sub.on_completed) {}
+    on_completed(sub.on_completed),
+    id(usub_id++) {}
+
+subscriber& subscriber::operator=(subscriber &sub){
+    return sub;
+}
+
+// move constructor
+subscriber::subscriber(subscriber &&sub) :
+    on_next(sub.on_next), 
+    on_error(sub.on_error), 
+    on_completed(sub.on_completed),
+    id(usub_id) {
+
+        sub.on_next = nullptr;
+        sub.on_error = nullptr;
+        sub.on_completed = nullptr;
+        sub.id = 0;
+}
+
 
 /**
  * Methods and variable declarations for the SUBSCRIBER_POOL class
