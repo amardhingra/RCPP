@@ -12,6 +12,8 @@
 #include <thread>
 #include <iostream>
 
+typedef unsigned long stream_id;
+
 typedef unsigned long sub_id;
 typedef unsigned long stream_id;
 /*
@@ -83,7 +85,9 @@ public:
  * deal with errors and handle stream termination
  */
 class subscriber {
-    //sub_id id;
+
+private:
+    static sub_id usub_id;
 
 public:
     // unique identifier for subscriber
@@ -99,31 +103,21 @@ public:
 
 
 public:
-    static void simple_on_next(subscriber_event n){
-        // TODO: define behavior for simple next handler
-    }
+    static void simple_on_next(subscriber_event n);
 
-    static void simple_on_error(std::exception e){
-        // TODO: define behavior for simple error handler
-    }
+    static void simple_on_error(std::exception e);
 
-    static void simple_on_completed(){
-        // TODO: define behavior for simple completed handler
-        // behaviour should include removing the stream from the stream map
-    }
+    static void simple_on_completed();
 
 public:
-    subscriber(){};
     // constructor only requires an on_next function
     subscriber(
-        std::function<void(subscriber_event)> next,
+        std::function<void(subscriber_event)> next = simple_on_next,
         std::function<void(std::exception)> error = simple_on_error,
-        std::function<void()> completed = simple_on_completed) :
-    on_next(next), on_error(error), on_completed(completed) {};
+        std::function<void()> completed = simple_on_completed);
 
     // copy constructor
-    subscriber(subscriber &sub) :
-        on_next(sub.on_next), on_error(sub.on_error), on_completed(sub.on_completed) {};
+    subscriber(const subscriber &sub);
 
 }; // end subscriber
 
@@ -175,8 +169,8 @@ public:
     void complete(sub_id id);
 
     // used to register a subscriber with the burrent subscriber_pool
-    sub_id register_subscriber(subscriber& sub);
-    sub_id register_subscriber(subscriber& sub, stream_id id);
+    sub_id register_subscriber(subscriber sub);
+    sub_id register_subscriber(subscriber sub, stream_id id);
 
 };
 

@@ -4,10 +4,12 @@
 #include <iostream>
 #include <chrono>
 
+/**
+ * Methods and variable declarations for the SUBSCRIBER_EVENT class
+ **/
 
-/*
- * copy constructor for subscriber_event
- */
+
+//copy constructor for subscriber_event
 subscriber_event::subscriber_event(const subscriber_event& event){
     // copy type
     type = event.type;
@@ -30,7 +32,43 @@ subscriber_event::subscriber_event(const subscriber_event& event){
 }
 
 
-// worker thread function
+/**
+ * Methods and variable declarations for the SUBSCRIBER class
+ **/
+
+sub_id subscriber::usub_id;
+
+void subscriber::simple_on_next(subscriber_event event){
+    // TODO: define behavior for simple next handler
+}
+
+void subscriber::simple_on_error(std::exception e){
+    // TODO: define behavior for simple error handler
+}
+
+void subscriber::simple_on_completed(){
+    // TODO: define behavior for simple completed handler
+    // behaviour should include removing the stream from the stream map
+}
+
+subscriber::subscriber(std::function<void(subscriber_event)> next,
+                       std::function<void(std::exception)> error,
+                       std::function<void()> completed) :
+    on_next(next), 
+    on_error(error), 
+    on_completed(completed), 
+    id(usub_id++) {}
+
+subscriber::subscriber(const subscriber &sub) :
+    on_next(sub.on_next), 
+    on_error(sub.on_error), 
+    on_completed(sub.on_completed) {}
+
+/**
+ * Methods and variable declarations for the SUBSCRIBER_POOL class
+ */
+
+// worker thread function for the subscriber_pool class
 void subscriber_pool::handle_event(){
     while(true){
         // acquire lock
@@ -113,7 +151,7 @@ void subscriber_pool::complete(sub_id id){
 }
 
 
-sub_id subscriber_pool::register_subscriber(subscriber &sub) {
+sub_id subscriber_pool::register_subscriber(subscriber sub) {
     
     // lock the subscriber pool
     while(!sub_lock.try_lock());
@@ -183,7 +221,7 @@ int main(void){
     subscriber s1(func1);
     subscriber s2(func2);
     subscriber s3(func3);
-    subscriber s4(func4);å
+    subscriber s4(func4);
     pool.register_subscriber(subscriber(func1));
     pool.register_subscriber(s2);
     pool.register_subscriber(s3);
