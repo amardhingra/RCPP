@@ -8,27 +8,6 @@
  **/
 
 
-//copy constructor for subscriber_event
-subscriber_event::subscriber_event(const subscriber_event& event){
-    // copy type
-    type = event.type;
-
-    // copy correct variable from data
-    switch(type){
-        case message_type::BOOL:
-            data.b = event.data.b;
-            break;
-        case message_type::INT:
-            data.i = event.data.i;
-            break;
-        case message_type::FLOAT:
-            data.f = event.data.f;
-            break;
-        case message_type::STR:
-            data.s = event.data.s;
-            break;
-    }
-}
 
 
 /**
@@ -275,19 +254,19 @@ void func4(event<int> event){
 }
 
 #ifndef MAIN
-int main(void){
-    using namespace std;
-    subscriber_pool<int> pool(2);
-    pool.register_subscriber(subscriber<int>(func1), 0);
-    pool.register_subscriber(subscriber<int>(func2), 0);
-    pool.register_subscriber(subscriber<int>(func3), 1);
-    pool.register_subscriber(subscriber<int>(func4), 0);
-    std::vector<sub_id> subs{0, 1, 2};
-    pool.notify_all(subs, event<int>::event(1));
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    for(int i = 0; i < 4; i++){
-        pool.complete(i);
-    }
-    return 0;
-}
+// int main(void){
+//     using namespace std;
+//     subscriber_pool<int> pool(2);
+//     pool.register_subscriber(subscriber<int>(func1), 0);
+//     pool.register_subscriber(subscriber<int>(func2), 0);
+//     pool.register_subscriber(subscriber<int>(func3), 1);
+//     pool.register_subscriber(subscriber<int>(func4), 0);
+//     std::vector<sub_id> subs{0, 1, 2};
+//     pool.notify_all(subs, event<int>::event(1));
+//     std::this_thread::sleep_for(std::chrono::seconds(1));
+//     for(int i = 0; i < 4; i++){
+//         pool.complete(i);
+//     }
+//     return 0;
+// }
 #endif

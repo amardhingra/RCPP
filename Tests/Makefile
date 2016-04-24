@@ -32,7 +32,7 @@ stream.o: stream.cpp stream.h
 
 test: CXXFLAGS += -DMAIN
 test: CCFLAGS += -DMAIN
-test: test.o stream.o
+test: test.o stream.o subscriber.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o test
 
 test.o: test.cpp stream.h 

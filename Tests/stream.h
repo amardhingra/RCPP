@@ -21,7 +21,7 @@ class stream {
     //seems like there would be ownership problems with this model
     subscriber_pool<T> *thread_pool; 
 
-    private:
+    public:
     void change();
 
     void clear_changed();
