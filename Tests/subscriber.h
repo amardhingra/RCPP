@@ -12,10 +12,11 @@
 #include <thread>
 #include <iostream>
 
-typedef unsigned long stream_id;
+#include "event.h"
+#include "stream.h"
 
 typedef unsigned long sub_id;
-typedef unsigned long stream_id;
+
 /*
  * Subscriber Event
  * Defines a class that allows a stream to pass an event
