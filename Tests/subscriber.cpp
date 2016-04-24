@@ -138,6 +138,9 @@ void subscriber_pool::notify(sub_id id, subscriber_event event){
     e_cond.notify_all();
 }
 
+void subscriber_pool::notify_stream(stream_id id, subscriber_event event) {
+    
+}
 
 void subscriber_pool::error(sub_id id, std::exception e){
     subscriber sub;

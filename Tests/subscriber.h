@@ -15,7 +15,7 @@
 typedef unsigned long stream_id;
 
 typedef unsigned long sub_id;
-
+typedef unsigned long stream_id;
 /*
  * Subscriber Event
  * Defines a class that allows a stream to pass an event
@@ -85,8 +85,10 @@ public:
  * deal with errors and handle stream termination
  */
 class subscriber {
+
 private:
     static sub_id usub_id;
+
 public:
     // unique identifier for subscriber
     sub_id id;
@@ -162,7 +164,7 @@ public:
     // called to pass a new subscriber_event to subscriber given by sub_id
     void notify(sub_id id, subscriber_event event);
     void notify(std::vector<sub_id>& ids, subscriber_event event);
-    void notify(stream_id str_id);
+    void notify_stream(stream_id str_id, subscriber_event event);
 
     // used to notify a subscriber when a stream encounters an exception
     void error(sub_id id, std::exception e);
