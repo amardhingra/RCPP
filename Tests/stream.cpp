@@ -1,13 +1,15 @@
 #include "stream.h"
 
-stream::stream(subscriber_pool* some_pool){
+template <typename T>
+stream::stream(subscriber_pool<T>* some_pool){
     thread_pool = some_pool; 
     id++;
 }
 
 //create a threadpool with concurrency 2 if none exists
+template <typename T>
 stream::stream(){
-    subscriber_pool pool(2);
+    subscriber_pool<T> pool(2);
     thread_pool = &pool;
     id++;
 }
@@ -24,14 +26,16 @@ bool stream::has_changed() {
     return changed;
 }
 
-// Add a single new subscriber 
-void stream::register_subscriber(subscriber new_subscriber) {
+// Add a single new subscriber
+template <typename T> 
+void stream::register_subscriber(subscriber<T> new_subscriber) {
     thread_pool->register_subscriber(new_subscriber, id);
 }
 
 // Add a vector of new subscribers
-void stream::register_subscriber(std::vector<subscriber> new_subscribers){
-    for (subscriber new_subscriber : new_subscribers )
+template <typename T>
+void stream::register_subscriber(std::vector<subscriber<T>> new_subscribers){
+    for (subscriber<T> new_subscriber : new_subscribers )
         thread_pool->register_subscriber(new_subscriber, id);
 }
 
