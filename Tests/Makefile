@@ -1,8 +1,25 @@
 CC = gcc
 CXX = g++
-CFLAGS = -std=c++11 -I/usr/local/include
-CXXFLAGS = -std=c++11 -I/usr/local/include
+
+CFLAGS   = -std=c++11 -g -Wall $(INCLUDES)
+CXXFLAGS = -std=c++11 -g -Wall $(INCLUDES)
+
+INCLUDES = -I/usr/local/include
+
 LDFLAGS = -L/usr/local/lib -lboost_thread-mt -lboost_system
+LDLIBS = 
+
+# executables: helloworld test
+
+# objects: stream.o subscriber.o test.o helloworld.o
+
+# .PHONY: default
+# default: $(executables)
+
+# $(executables): subscriber.o stream.o
+
+# $(objects): stream.h event.h subscriber.h
+
 
 default: helloworld
 
@@ -30,18 +47,18 @@ helloworld2: helloworld2.cpp rc.o
 stream.o: stream.cpp stream.h event.h
 	$(CXX) $(CXXFLAGS) stream.cpp -c
 
-#test: CXXFLAGS += -DMAIN
-#test: CCFLAGS += -DMAIN
-test: test.o stream.o subscriber.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o test
+test: CXXFLAGS += -DMAIN
+test: CCFLAGS += -DMAIN
+test: test.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) test.o -o test
 
 test.o: test.cpp stream.h 
 	$(CXX) $(CXXFLAGS) test.cpp -c
 
 
-.PHONY:
+.PHONY: clean
 clean:
 	rm -f *~ *.o helloworld2 helloworld a.out subscriber test
 
-.PHONY:
+.PHONY: all
 all: clean default

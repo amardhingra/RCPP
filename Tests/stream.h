@@ -64,7 +64,7 @@ class stream {
     void register_subscriber(subscriber<T> new_subscriber){
         thread_pool->register_subscriber(new_subscriber, id);
     };
-    void register_subscriber(std::vector<subscriber<T>> subscribers){
+    void register_subscriber(std::vector<subscriber<T>> new_subscribers){
         for (subscriber<T> new_subscriber : new_subscribers )
             thread_pool->register_subscriber(new_subscriber, id);
     };

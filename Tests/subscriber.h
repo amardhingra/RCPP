@@ -15,9 +15,10 @@
 #include "event.h"
 // #include "stream.h"
 
+#define MAX_SUB_THREADS 16
+
 typedef unsigned long sub_id;
 typedef unsigned long stream_id;
-
 
 /*
  * Subscriber
@@ -44,27 +45,54 @@ public:
 
 
 public:
-    static void simple_on_next(event<T> n);
+    static void simple_on_next(event<T> n){};
 
-    static void simple_on_error(std::exception e);
+    static void simple_on_error(std::exception e){};
 
-    static void simple_on_completed();
+    static void simple_on_completed(){};
 
 public:
     // constructor only requires an on_next function
     subscriber(
         std::function<void(event<T>)> next,
         std::function<void(std::exception)> error = simple_on_error,
-        std::function<void()> completed = simple_on_completed);
+        std::function<void()> completed = simple_on_completed) :
+        
+        id(usub_id++),
+        on_next(next), 
+        on_error(error), 
+        on_completed(completed) 
+        {};
 
     // copy constructor
-    subscriber(const subscriber &sub);
-    subscriber& operator=(subscriber &sub);
+    subscriber(const subscriber &sub) :
+        id(usub_id++),
+        on_next(sub.on_next), 
+        on_error(sub.on_error), 
+        on_completed(sub.on_completed)
+    {};
+
+    subscriber& operator=(subscriber &sub){
+        return sub;
+    };
 
     // move constructor
-    subscriber(subscriber &&sub);
+    subscriber(subscriber &&sub) :
+        id(usub_id),
+        on_next(sub.on_next), 
+        on_error(sub.on_error), 
+        on_completed(sub.on_completed) {
+
+            sub.on_next = nullptr;
+            sub.on_error = nullptr;
+            sub.on_completed = nullptr;
+            sub.id = 0;
+    };
 
 }; // end subscriber
+
+template <typename T>
+sub_id subscriber<T>::usub_id;
 
 
 /*
@@ -78,7 +106,7 @@ class subscriber_pool {
 private:
     // wrapper class to store the subscriber_event and subscriber_id to 
     // which the event is related
-    class queue_event {
+    struct queue_event {
     public:
         sub_id           s_id;
         event<T>         s_event;
@@ -97,27 +125,159 @@ private:
     std::map<stream_id, std::vector<sub_id>>  stream_subs;
 
     // function passed to threads to handle subscriber_events
-    void handle_event();
+    void handle_event(){
+        while(true){
+            // acquire lock
+            std::unique_lock<std::mutex> lk(e_lock);
+
+            // wait until told to exit or while queue is empty
+            while(!end && events.size() == 0){
+
+                e_cond.wait(lk);
+
+                // exit on flag
+                if(end){
+                    lk.unlock();
+                    return;
+                }
+            }
+
+            if(end){
+                lk.unlock();
+                return;
+            }
+
+            // get event from queue and remove it from queue
+            if(events.size() == 0)
+                continue;
+
+            struct queue_event ev = events.front();
+            events.pop_front();
+            lk.unlock();
+
+            // call the on_next function for the corresponding subscriber
+            while(!sub_lock.try_lock());
+            if(subscribers.count(ev.s_id) == 0){
+                sub_lock.unlock();
+                continue;
+            }
+            subscriber<T> sub = subscribers.at(ev.s_id);
+            sub_lock.unlock();
+
+            sub.on_next(ev.s_event);
+        }
+    };
+    void grow();
 public:
 
     // constructor with default concurrency level set to 1
-    subscriber_pool(int concurrency = 1);
-    ~subscriber_pool();
+    subscriber_pool(int concurrency = 1){
+        // never make more than 16 threads
+        int max = concurrency > 16 ? 16 : concurrency;
+
+        // create threads based on the concurrency requested
+        for(int i = 0; i < max; i++){
+            pool.push_back(std::thread(&subscriber_pool<T>::handle_event, this));
+        }
+    };
+
+    // destructor
+    ~subscriber_pool(){
+        // set the end flag
+        std::unique_lock<std::mutex> lk(e_lock);
+        end = true;
+        lk.unlock();
+
+        // join all worker threads
+        for(auto& t : pool){
+            e_cond.notify_all();
+            t.join();
+        }
+
+    };
 
     // called to pass a new subscriber_event to subscriber given by sub_id
-    void notify(sub_id id, event<T> event);
-    void notify_all(std::vector<sub_id>& ids, event<T> event);
-    void notify_stream(stream_id str_id, event<T> event);
+    void notify(sub_id id, event<T> event){
+
+        // create an event to add to the queue
+        struct queue_event ev(id, event);
+
+        // lock the queue and add the event to it
+        std::unique_lock<std::mutex> lk(e_lock);
+        events.push_back(ev);
+        lk.unlock();
+
+        // wake up any worker threads
+        e_cond.notify_all();
+    };
+
+    void notify_all(std::vector<sub_id>& ids, event<T> event){
+        for(auto id : ids){
+            notify(id, event);
+        }
+    };
+    
+    void notify_stream(stream_id str_id, event<T> event){
+        for(auto id : stream_subs.at(str_id)){
+            notify(id, event);
+        }
+    };
 
     // used to notify a subscriber when a stream encounters an exception
-    void error(sub_id id, std::exception e);
+    void error(sub_id id, std::exception e){
+        while(!sub_lock.try_lock());
+        if(subscribers.count(id) == 0){
+            sub_lock.unlock();
+            return;
+        }
+        subscriber<T> sub = subscribers.at(id);
+        sub_lock.unlock();
+        sub.on_error(e);
+    };
 
     // used to notify a subscriber that a stream has ended
-    void complete(sub_id id);
+    void complete(sub_id id){
+        // lock the subscriber pool
+        while(!e_lock.try_lock());
+        while(!sub_lock.try_lock());
+
+        // get and delete the subscriber
+        subscriber<T> sub = subscribers.at(id);
+        subscribers.erase(id);
+
+        // unlock the subscriber pool
+        sub_lock.unlock();
+        e_lock.unlock();
+        // call the subscribers on_complete function
+        sub.on_completed();
+    };
 
     // used to register a subscriber with the current subscriber_pool
-    void register_subscriber(subscriber<T> sub);
-    void register_subscriber(subscriber<T> sub, stream_id id);
+    void register_subscriber(subscriber<T> sub){
+        
+        // lock the subscriber pool
+        while(!sub_lock.try_lock());
+        
+        // OLD: add the subscriber to the map
+        subscribers.insert(std::pair<sub_id, subscriber<T>&>(id, sub));
+        
+        // unlock the subscriber pool
+        sub_lock.unlock();
+    };
+
+    // used to register a subscriber and indicate the stream it is associated with
+    void register_subscriber(subscriber<T> sub, stream_id id){
+
+        // lock the subscriber pool
+        while(!sub_lock.try_lock());
+        
+        // add a stream_id mapping
+        subscribers.insert(std::pair<sub_id, subscriber<T>&>(sub.id, sub));
+        stream_subs[id].push_back(sub.id);
+
+        // unlock the subscriber pool
+        sub_lock.unlock();
+    };
 
 };
 
