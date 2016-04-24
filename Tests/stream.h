@@ -16,7 +16,7 @@ typedef unsigned long stream_id;
 template <typename T>
 class stream {
     //initially set to 0
-	stream_id id = 0; 
+	static stream_id id; 
 
     bool changed = false;
 
@@ -51,7 +51,7 @@ class stream {
         thread_pool = some_pool; 
         id++;
     };  
-    
+
 	~stream(){}; 
     
     // Factory method: returns a stream from keyboard input
@@ -92,5 +92,8 @@ class stream {
     void get_keyboard_input(); 
 
 };
+
+template <typename T>
+stream_id stream<T>::id;
 
 #endif
