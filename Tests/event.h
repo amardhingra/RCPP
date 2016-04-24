@@ -11,7 +11,7 @@ public:
     // set the correct member of the enum and assign the correct selector
     event(T data): _data (data) {};
 
-    event(const event &event): _data (event.data) {};
+    event(const event &event): _data (event._data) {};
 
 public:
     // accessors
