@@ -24,6 +24,7 @@ void func4(event<std::string> event){
 
 int main(void){
     using namespace std;
+    try{
     subscriber_pool<string> pool(2);
     //stream *keyboard_stream = stream::stream_from_keyboard_input(pool);
     subscriber_pool<string>* pool_ptr = &pool;
@@ -46,6 +47,9 @@ int main(void){
     vector<subscriber<string>> slist = {s1, s2, s3, s4};   
     keyboard_stream.register_subscriber(slist); 
     keyboard_stream.start();
+} catch(std::exception &e){
+    std::cout << e.what() << std::endl;
+}
 
 
    //source.register_subscriber(new subscriber(function whatever))
