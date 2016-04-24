@@ -61,6 +61,7 @@ int main(void){
         cout << "4" << endl;
         keyboard_stream.notify_subscribers(my_event);
     }
+
     //keyboard_stream.start();
 } catch(std::exception &e){
     std::cout << e.what() << std::endl;
