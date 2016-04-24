@@ -8,7 +8,7 @@ typedef unsigned long stream_id;
 
 class stream {
     //initially set to 0
-	stream_id id=0; 
+	stream_id id = 0; 
 
     bool changed = false;
 
