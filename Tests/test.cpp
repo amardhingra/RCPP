@@ -19,7 +19,7 @@ void func3(event<int> event){
     cout << "func 3" << endl;
 }
 
-void func4(event<std::string> event){
+void func4(event<int> event){
     using namespace std;
     cout << "func 4" << endl;
 }
@@ -29,7 +29,6 @@ int main(void){
 
     subscriber_pool<int> pool;
     subscriber_pool<int>* pool_ptr = &pool;
-
 
     std::function<void(stream<int> my_stream)> my_on_subscribe = [](stream<int> my_stream) {
         for (int i = 1; i < 7; i ++) {
@@ -42,24 +41,25 @@ int main(void){
          }
     };
 
-    stream<int> *int_stream = stream<int>::create(my_on_subscribe, pool_ptr);
-    //keyboard_stream.on_subscribe = my_on_subscribe;
+   // stream<int> *int_stream = stream<int>::create(my_on_subscribe, pool_ptr);
 
-    subscriber<int> s1(greater_than_3); //subscribers specify the streams they subscribe to, get assigned unique id in that stream 
+    stream<int> int_stream(pool_ptr);
+    int_stream.on_subscribe = my_on_subscribe;
+
+    subscriber<int> s1(greater_than_3); 
     subscriber<int> s2(you_entered_int);
-    subscriber<int> s3(func3);
-    subscriber<string> s4(func4);
+
 
     vector<subscriber<int>> slist = {s1, s2};   
 
-      //  keyboard_stream->register_subscriber(s1); 
+//    int_stream->register_subscriber(slist); 
+    int_stream.register_subscriber(slist); 
 
-    int_stream->register_subscriber(slist); 
+    int_stream.start();
 
-    
-    //keyboard_stream.register_subscriber(slist); 
 
-   // stream<int> mapped_stream(pool_ptr);
+    /////////////////////
+
 
     subscriber_pool<int> pool2;
     subscriber_pool<int>* pool_ptr2 = &pool2;
@@ -79,8 +79,16 @@ int main(void){
 
     int_stream2.on_subscribe = my_on_subscribe2;
 
-    int_stream2.register_subscriber(s3);
+    subscriber<int> s3(func3);
+    subscriber<int> s4(func4);
+
+    vector<subscriber<int>> slist2 = {s3, s4};   
+
+
+    int_stream2.register_subscriber(slist2);
     int_stream2.start();
+
+   // sleep(1);
     
     /*
    std::function<void(stream<int> my_stream)> my_on_subscribe2 = [](stream<int> my_stream) {
@@ -104,7 +112,8 @@ int main(void){
         keyboard_stream.notify_subscribers(my_event);
     }*/
 
-    int_stream->start();
+    //int_stream->start();
+
 /*} catch(std::exception &e){
     std::cout << e.what() << std::endl;
 }*/
