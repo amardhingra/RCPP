@@ -33,9 +33,12 @@ int main(void){
     };
 
     // this works
-    //stream<int> int_stream(pool_ptr);
+    // stream<int> int_stream(pool_ptr);
 
-    // Description of bug: Using default stream constructor results in hang when you try to register_subscriber on that stream. Commenting out the above line and uncommenting the below line should result in hang, along with "trying to get lock" printed to screen repeatedly.
+    // Description of bug: Using default stream constructor results in hang when you try to register_subscriber on that stream. 
+    // Correct behavior: should print numbers from 1-6; printing out each number; telling you if the number is greater than 3.
+    // Current(buggy) behavior: The program hangs while trying to get the lock in register_subscriber. "trying to get lock" printed to screen repeatedly.
+    // Commenting out the below initializer and Using the above, commented-out initializer (the one that takes pool_ptr) will result in correct behavior. 
 
     // this fails
     stream<int> int_stream;

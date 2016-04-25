@@ -33,9 +33,9 @@ int main(void){
         keyboard_stream.notify_subscribers(e);
         
         // Description of bug: events get lost if I don't call sleep after each event is fired. 
-        // Expected behavior: the numbers 100 - 104 will get printed to the screen, along with "The word you entered is longer than 2 characters".
-        // Currently, only 1 handler might get called.
-        // Uncommenting below line should result in all numbers 100-104 getting printed to the screen and "the word you entered..." printing.
+        // Correct behavior: the numbers 100 - 104 should get printed to the screen, along with "The word you entered is longer than 2 characters".
+        // Current(buggy) behavior: only 1 handler might get called.
+        // Uncommenting below line results in correct behavior.
         // usleep(50);
 
      }
