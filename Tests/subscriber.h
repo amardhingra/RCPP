@@ -212,7 +212,9 @@ public:
 
         // lock the queue and add the event to it
         std::unique_lock<std::mutex> lk(e_lock);
+        
         events.push_back(ev);
+
         lk.unlock();
 
         // wake up any worker threads
