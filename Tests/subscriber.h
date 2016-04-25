@@ -264,7 +264,7 @@ public:
 
     // used to register a subscriber with the current subscriber_pool
     void register_subscriber(subscriber<T> sub){
-        
+
         // lock the subscriber pool
         while(!sub_lock.try_lock());
         
@@ -278,8 +278,12 @@ public:
     // used to register a subscriber and indicate the stream it is associated with
     void register_subscriber(subscriber<T> sub, stream_id id){
 
+        //TODO: it'll hang here forever if you make the stream using stream's default constructor
         // lock the subscriber pool
-        while(!sub_lock.try_lock());
+        while(!sub_lock.try_lock())
+            std::cout << "trying to get lock" << std::endl;
+
+        std::cout << "got the lock" << std::endl;
 
         // add a stream_id mapping
         subscribers.insert(std::pair<sub_id, subscriber<T>>(sub.id, sub));

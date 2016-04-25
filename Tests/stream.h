@@ -41,6 +41,7 @@ class stream {
     public:
     //default constructor, will eventually take from a source. 
     stream(){
+        std::cout << "calling stream default constructor" << std::endl;
         subscriber_pool<InputType> pool(2);
         thread_pool = &pool;
         id++;
@@ -58,7 +59,9 @@ class stream {
     //static stream *stream_from_keyboard_input(subscriber_pool* pool);
 
     // A function that gets events and notifies subscribers accordingly
-    std::function<void()> get_events_from_source;
+    //std::function<void()> get_events_from_source;
+
+    std::function<void(stream<InputType> my_stream)> on_subscribe;
 
     // Add a new subscriber to this stream
     void register_subscriber(subscriber<InputType> new_subscriber){
@@ -73,6 +76,7 @@ class stream {
     //template<class T> 
     void notify_subscribers(event<InputType> new_event){
          if (this->has_changed()) {
+           // std::cout << "1" << std::endl;
         // auto pool_subscribers = thread_pool->pool;
         // for (subscriber pool_subscriber : pool_subscribers)
         //     pool_subscribers.notify(new_event);
@@ -83,13 +87,17 @@ class stream {
 
     // Starts the stream;
     void start(){
-        while(true) {
-            get_events_from_source();
-        }
-    };
+        on_subscribe(*this);
 
-    // Test function that 
-    //void get_keyboard_input(); 
+    };
+/*
+    static stream<InputType> *create(std::function<void(stream<InputType> my_stream)> on_subscribe) {
+        std::cout << "3" << std::endl;
+        stream *new_stream = new stream;
+        new_stream->on_subscribe = on_subscribe;
+        return new_stream;
+    }*/
+
 
 };
 

@@ -11,7 +11,7 @@ void func1(event<std::string> event){
 
 void func2(event<std::string> event){
     using namespace std;
-    cout << "func 2" << endl;
+    cout << "you entered " << event.get_data() << endl;
 }
 
 void func3(event<std::string> event){
@@ -26,19 +26,31 @@ void func4(event<std::string> event){
 
 int main(void){
     using namespace std;
-    try{
-    subscriber_pool<string> pool(2);
+
+    subscriber_pool<string> pool;
     //stream *keyboard_stream = stream::stream_from_keyboard_input(pool);
     subscriber_pool<string>* pool_ptr = &pool;
 
     stream<string> keyboard_stream(pool_ptr);
-    // keyboard_stream.get_events_from_source = [keyboard_stream]() {   
-    //     string keyinput;
-    //     cin >> keyinput; 
-    //     event<string> my_event(keyinput);
-    //     keyboard_stream.change();
-    //     keyboard_stream.notify_subscribers(my_event);
-    // };
+
+    //stream<string> keyboard_stream;
+
+    std::function<void(stream<std::string> my_stream)> my_on_subscribe = [](stream<std::string> my_stream) {
+        for (int i = 101; i < 105; i ++) {
+            event<std::string> e = event<std::string>(std::to_string(i));
+            my_stream.change();
+            my_stream.notify_subscribers(e);
+            usleep(50);
+
+         }
+    };
+
+
+
+    //stream<string> keyboard_stream = stream<string>::create(my_on_subscribe);
+    keyboard_stream.on_subscribe = my_on_subscribe;
+
+    //stream<string> *keyboard_stream = stream<string>::create(my_on_subscribe);
 
 
     subscriber<string> s1(func1); //subscribers specify the streams they subscribe to, get assigned unique id in that stream 
@@ -47,28 +59,34 @@ int main(void){
     subscriber<string> s4(func4);
 
     vector<subscriber<string>> slist = {s1, s2, s3, s4};   
+
+      //  keyboard_stream->register_subscriber(s1); 
+
     keyboard_stream.register_subscriber(slist); 
 
+    
+    //keyboard_stream.register_subscriber(slist); 
+
+/*
     while(true) {
-        cout << "1" << endl;
         string keyinput;
         cin >> keyinput;
-        cout << "2" << endl; 
         event<string> my_event(keyinput);
-        pool.notify(0, keyinput);
-        cout << "3" << endl;
         keyboard_stream.change();
-        cout << "4" << endl;
         keyboard_stream.notify_subscribers(my_event);
-    }
+    }*/
+/*
+    for (int i = 101; i < 105; i ++) {
+        event<std::string> e = event<std::string>(std::to_string(i));
+        keyboard_stream.change();
+        keyboard_stream.notify_subscribers(e);
+        usleep(100);
 
-    //keyboard_stream.start();
-} catch(std::exception &e){
+     }*/
+    keyboard_stream.start();
+/*} catch(std::exception &e){
     std::cout << e.what() << std::endl;
-}
-
-
-   //source.register_subscriber(new subscriber(function whatever))
+}*/
 	
 
     return 0;
