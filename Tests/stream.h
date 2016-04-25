@@ -99,6 +99,10 @@ class stream {
         return new_stream;
     }
 
+    //stream<InputType> 
+
+    std::vector<stream<InputType>> children;
+
 
 };
 

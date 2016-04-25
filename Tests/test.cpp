@@ -14,7 +14,7 @@ void you_entered_int(event<int> event){
     cout << "you entered " << event.get_data() << endl;
 }
 
-void func3(event<std::string> event){
+void func3(event<int> event){
     using namespace std;
     cout << "func 3" << endl;
 }
@@ -30,9 +30,10 @@ int main(void){
     subscriber_pool<int> pool;
     subscriber_pool<int>* pool_ptr = &pool;
 
+
     std::function<void(stream<int> my_stream)> my_on_subscribe = [](stream<int> my_stream) {
         for (int i = 1; i < 7; i ++) {
-            //event<std::string> e = event<std::string>(std::to_string(i));
+            std::cout << "1" << endl;
             event<int> e(i);
             my_stream.change();
             my_stream.notify_subscribers(e);
@@ -46,8 +47,8 @@ int main(void){
 
     subscriber<int> s1(greater_than_3); //subscribers specify the streams they subscribe to, get assigned unique id in that stream 
     subscriber<int> s2(you_entered_int);
-   /* subscriber<string> s3(func3);
-    subscriber<string> s4(func4);*/
+    subscriber<int> s3(func3);
+    subscriber<string> s4(func4);
 
     vector<subscriber<int>> slist = {s1, s2};   
 
@@ -58,6 +59,42 @@ int main(void){
     
     //keyboard_stream.register_subscriber(slist); 
 
+   // stream<int> mapped_stream(pool_ptr);
+
+    subscriber_pool<int> pool2;
+    subscriber_pool<int>* pool_ptr2 = &pool2;
+
+    stream<int> int_stream2(pool_ptr2);
+
+    std::function<void(stream<int> my_stream)> my_on_subscribe2 = [](stream<int> my_stream) {
+        for (int i = 2; i < 5; i ++) {
+            std::cout << "2" << endl;
+            event<int> e(i);
+            my_stream.change();
+            my_stream.notify_subscribers(e);
+            usleep(100);
+
+         }
+    };
+
+    int_stream2.on_subscribe = my_on_subscribe2;
+
+    int_stream2.register_subscriber(s3);
+    int_stream2.start();
+    
+    /*
+   std::function<void(stream<int> my_stream)> my_on_subscribe2 = [](stream<int> my_stream) {
+        for (int i = 1; i < 7; i ++) {
+            event<int> e(i);
+            my_stream.change();
+            my_stream.notify_subscribers(e);
+            usleep(100);
+
+         }
+    };
+    stream<int> *int_stream2 = stream<int>::create(my_on_subscribe2, pool_ptr2);
+    int_stream2->register_subscriber(s3);*/
+
 /*
     while(true) {
         string keyinput;
@@ -66,19 +103,12 @@ int main(void){
         keyboard_stream.change();
         keyboard_stream.notify_subscribers(my_event);
     }*/
-/*
-    for (int i = 101; i < 105; i ++) {
-        event<std::string> e = event<std::string>(std::to_string(i));
-        keyboard_stream.change();
-        keyboard_stream.notify_subscribers(e);
-        usleep(100);
 
-     }*/
     int_stream->start();
 /*} catch(std::exception &e){
     std::cout << e.what() << std::endl;
 }*/
 	
-
+    //TODO delete int_stream b/c it was new'd... or handle it some other way
     return 0;
 }
