@@ -115,6 +115,9 @@ class stream {
     // A function that gets events and notifies subscribers accordingly
     std::function<void()> get_events_from_source;
 
+    std::function<void(subscriber my_subscriber)> on_subscribe;
+
+
     void setChanged() {
         changed = true;
     }
@@ -132,6 +135,8 @@ class stream {
         my_subscribers.push_back(new_subscriber);
     }
 
+
+
     // If the stream has changed, then notify all subscribers and clear the "changed" variable to indicate that the stream has no longer changed
     void notifySubscribers(event new_event) {
         if (this->hasChanged()) {
@@ -143,9 +148,11 @@ class stream {
 
     // Starts the stream; will continuously call get_events_from_source.
     void start() {
-        while(true) {
+        /*while(true) {
             get_events_from_source();
-        }
+        }*/
+        for (subscriber my_subscriber : my_subscribers)
+                on_subscribe(my_subscriber);
     }
 
     // Test function that 
@@ -158,6 +165,15 @@ class stream {
             setChanged();
             notifySubscribers(keyinput);
         }
+    }
+
+    static stream *create(std::function<void(subscriber my_subscriber)> on_subscribe) {
+
+        stream *new_stream = new stream;
+
+        new_stream->on_subscribe = on_subscribe;
+
+        return new_stream;
     }
 
 };
@@ -180,6 +196,35 @@ stream *stream::stream_from_keyboard_input() {
 // Sets up a stream from the keyboard input. Adds 2 subscribers: the first will echo your input back at you, the second will tell you if what you entered is longer than 2 characters.
 int main() {
 
+    // this should be a function that takes a subscriber
+    std::function<void(subscriber my_subscriber)> my_on_subscribe = [](subscriber my_subscriber) {
+        for (int i = 101; i < 105; i ++) {
+            event e = event(std::to_string(i));
+             my_subscriber.on_next(e);
+         }
+    };
+    stream *my_stream = stream::create(my_on_subscribe);
+
+    subscriber sub1;
+    sub1.on_next = [](event new_event) { 
+        cout << "You entered: " << new_event.data << endl; 
+    };
+    
+    subscriber sub2;
+    sub2.on_next = [](event new_event) { 
+        if (new_event.data.size() > 2) {
+            cout << "The word you entered is longer than 2 characters." << endl;
+        };
+    };
+
+    my_stream->subscribe(sub1);
+    my_stream->subscribe(sub2);
+
+    boost::thread t2(boost::bind(&stream::start, my_stream));
+    t2.join();
+
+
+/*
     // Create a new stream that reads in from keyboard
     stream *keyboard_stream = stream::stream_from_keyboard_input();
 
@@ -203,7 +248,7 @@ int main() {
 
     // Currently threading manually; in future we should probably do it automatically or via wrapper functions
     boost::thread t2(boost::bind(&stream::start, keyboard_stream));
-    t2.join();
+    t2.join();*/
 
     return 0;
 }
