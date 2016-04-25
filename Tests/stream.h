@@ -93,9 +93,16 @@ class stream {
 
     // create stream with pool and on_subscribe
     // TODO: create version of this w/o pool arg once stream's default constructor gets fixed
+    /*
     static stream<InputType> *create(std::function<void(stream<InputType> my_stream)> on_subscribe, subscriber_pool<InputType>* some_pool) {
         stream *new_stream = new stream(some_pool);
         new_stream->on_subscribe = on_subscribe;
+        return new_stream;
+    }*/
+
+    static stream<InputType> create(std::function<void(stream<InputType> my_stream)> on_subscribe, subscriber_pool<InputType>* some_pool) {
+        stream<InputType> new_stream (some_pool);
+        new_stream.on_subscribe = on_subscribe;
         return new_stream;
     }
 

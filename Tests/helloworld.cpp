@@ -152,17 +152,6 @@ class stream {
             on_subscribe(my_subscriber);
     }
 
-    // Test function that 
-    void get_keyboard_input() {
-        while(true) {
-
-            string keyinput;
-            cin >> keyinput;
-
-            setChanged();
-            notifySubscribers(keyinput);
-        }
-    }
 
     static stream *create(std::function<void(subscriber my_subscriber)> on_subscribe) {
 

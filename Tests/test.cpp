@@ -2,6 +2,12 @@
 #include "event.h"
 #include "subscriber.h"
 
+/* BUGS:
+1. stream1 defined before stream2. they share same pool. stream2 starts, then stream1 starts. stream1 and 2 both fire events, but only stream2's subscribers get called, even for stream1's events.
+2. stream1 defined before stream2. they have different pools. stream2 starts, then stream1 starts. stream2's events fire and get handled by its subscribers. when stream1 tries to start, program crashes w/ "libc++abi.dylib: terminating with uncaught exception of type std::out_of_range: map::at:  key not found
+Abort trap: 6"
+*/
+
 void greater_than_3(event<int> event){
     using namespace std;
     if (event.get_data() > 3) {
@@ -28,11 +34,10 @@ int main(void){
     using namespace std;
 
     subscriber_pool<int> pool;
-    subscriber_pool<int>* pool_ptr = &pool;
 
     std::function<void(stream<int> my_stream)> my_on_subscribe = [](stream<int> my_stream) {
         for (int i = 1; i < 7; i ++) {
-            std::cout << "1" << endl;
+           // std::cout << "1" << endl;
             event<int> e(i);
             my_stream.change();
             my_stream.notify_subscribers(e);
@@ -41,19 +46,12 @@ int main(void){
          }
     };
 
-   // stream<int> *int_stream = stream<int>::create(my_on_subscribe, pool_ptr);
-
-    stream<int> int_stream(pool_ptr);
-    int_stream.on_subscribe = my_on_subscribe;
+    stream<int> int_stream = stream<int>::create(my_on_subscribe, &pool);
 
     subscriber<int> s1(greater_than_3); 
     subscriber<int> s2(you_entered_int);
 
-
-    vector<subscriber<int>> slist = {s1, s2};   
-
-//    int_stream->register_subscriber(slist); 
-    int_stream.register_subscriber(slist); 
+    int_stream.register_subscriber({s1, s2}); 
 
     int_stream.start();
 
@@ -62,13 +60,10 @@ int main(void){
 
 
     subscriber_pool<int> pool2;
-    subscriber_pool<int>* pool_ptr2 = &pool2;
-
-    stream<int> int_stream2(pool_ptr2);
 
     std::function<void(stream<int> my_stream)> my_on_subscribe2 = [](stream<int> my_stream) {
         for (int i = 2; i < 5; i ++) {
-            std::cout << "2" << endl;
+           // std::cout << "2" << endl;
             event<int> e(i);
             my_stream.change();
             my_stream.notify_subscribers(e);
@@ -77,18 +72,15 @@ int main(void){
          }
     };
 
-    int_stream2.on_subscribe = my_on_subscribe2;
+    stream<int> int_stream2 = stream<int>::create(my_on_subscribe2, &pool2);
 
     subscriber<int> s3(func3);
     subscriber<int> s4(func4);
 
-    vector<subscriber<int>> slist2 = {s3, s4};   
-
-
-    int_stream2.register_subscriber(slist2);
+    int_stream2.register_subscriber({s3, s4});
     int_stream2.start();
 
-   // sleep(1);
+
     
     /*
    std::function<void(stream<int> my_stream)> my_on_subscribe2 = [](stream<int> my_stream) {
@@ -118,6 +110,5 @@ int main(void){
     std::cout << e.what() << std::endl;
 }*/
 	
-    //TODO delete int_stream b/c it was new'd... or handle it some other way
     return 0;
 }
