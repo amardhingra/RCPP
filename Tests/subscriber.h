@@ -66,7 +66,7 @@ public:
 
     // copy constructor
     subscriber(const subscriber &sub) :
-        id(usub_id++),
+        id(sub.id),
         on_next(sub.on_next), 
         on_error(sub.on_error), 
         on_completed(sub.on_completed)
@@ -78,7 +78,7 @@ public:
 
     // move constructor
     subscriber(subscriber &&sub) :
-        id(usub_id),
+        id(sub.id),
         on_next(sub.on_next), 
         on_error(sub.on_error), 
         on_completed(sub.on_completed) {
@@ -110,12 +110,14 @@ private:
     public:
         sub_id           s_id;
         event<T>         s_event;
-        queue_event(sub_id _id, event<T> _event) : s_id(_id), s_event(_event) {};
+        queue_event(sub_id _id, event<T> _event) : s_id(_id), s_event(_event) {
+            
+        };
     };
 
     bool                                   end = false; // tells threads when to exit
     sub_id                                 id = 0; // used for sequentially registering subscribers with unique ids
-    std::map<sub_id, subscriber<T>&>       subscribers; // maintains a map of subscribers for fast lookup
+    std::map<sub_id, subscriber<T>>       subscribers; // maintains a map of subscribers for fast lookup
     std::list<queue_event>                 events; // list of events to be processed
     std::mutex                             e_lock; // used to syncronize access to list
     std::condition_variable                e_cond; // used to let worker threads sleep
@@ -161,9 +163,9 @@ private:
                 sub_lock.unlock();
                 continue;
             }
+
             subscriber<T> sub = subscribers.at(ev.s_id);
             sub_lock.unlock();
-
             sub.on_next(ev.s_event);
         }
     };
@@ -265,7 +267,7 @@ public:
         while(!sub_lock.try_lock());
         
         // OLD: add the subscriber to the map
-        subscribers.insert(std::pair<sub_id, subscriber<T>&>(id, sub));
+        subscribers.insert(std::pair<sub_id, subscriber<T>>(id, sub));
         
         // unlock the subscriber pool
         sub_lock.unlock();
@@ -276,9 +278,9 @@ public:
 
         // lock the subscriber pool
         while(!sub_lock.try_lock());
-        
+
         // add a stream_id mapping
-        subscribers.insert(std::pair<sub_id, subscriber<T>&>(sub.id, sub));
+        subscribers.insert(std::pair<sub_id, subscriber<T>>(sub.id, sub));
         stream_subs[id].push_back(sub.id);
 
         // unlock the subscriber pool
