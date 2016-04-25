@@ -27,11 +27,16 @@ int main(void){
     vector<subscriber<string>> slist = {s1, s2};   
     keyboard_stream.register_subscriber(slist); 
 
-    for (int i = 101; i < 105; i ++) {
+    for (int i = 100; i < 105; i ++) {
         event<std::string> e = event<std::string>(std::to_string(i));
         keyboard_stream.change();
         keyboard_stream.notify_subscribers(e);
-        sleep(1);
+        
+        // Description of bug: events get lost if I don't call sleep after each event is fired. 
+        // Expected behavior: the numbers 100 - 104 will get printed to the screen, along with "The word you entered is longer than 2 characters".
+        // Currently, only 1 handler might get called.
+        // Uncommenting below line should result in all numbers 100-104 getting printed to the screen and "the word you entered..." printing.
+        // usleep(50);
 
      }
 

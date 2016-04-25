@@ -24,10 +24,20 @@ helloworld: helloworld.cpp stream.h subscriber.h
 test: test.cpp stream.h subscriber.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) test.cpp -o test
 
+# failing test
+test-fast-events-failing: test-fast-events-failing.cpp stream.h subscriber.h
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-fast-events-failing.cpp -o test-fast-events-failing
+
+# failing test
+test-stream-constructor-failing: test-stream-constructor-failing.cpp stream.h subscriber.h
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-stream-constructor-failing.cpp -o test-stream-constructor-failing
+
+
+
 
 .PHONY: clean
 clean:
-	rm -f *~ *.o helloworld2 helloworld a.out subscriber test
+	rm -f *~ *.o helloworld2 helloworld a.out subscriber test test-fast-events-failing test-stream-constructor-failing
 
 .PHONY: all
 all: clean executables
