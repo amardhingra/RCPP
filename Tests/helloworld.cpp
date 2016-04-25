@@ -113,7 +113,7 @@ class stream {
     static stream *stream_from_keyboard_input();
 
     // A function that gets events and notifies subscribers accordingly
-    std::function<void()> get_events_from_source;
+    //std::function<void()> get_events_from_source;
 
     std::function<void(subscriber my_subscriber)> on_subscribe;
 
@@ -148,11 +148,8 @@ class stream {
 
     // Starts the stream; will continuously call get_events_from_source.
     void start() {
-        /*while(true) {
-            get_events_from_source();
-        }*/
         for (subscriber my_subscriber : my_subscribers)
-                on_subscribe(my_subscriber);
+            on_subscribe(my_subscriber);
     }
 
     // Test function that 
@@ -170,14 +167,13 @@ class stream {
     static stream *create(std::function<void(subscriber my_subscriber)> on_subscribe) {
 
         stream *new_stream = new stream;
-
         new_stream->on_subscribe = on_subscribe;
-
         return new_stream;
     }
 
 };
 
+/*
 // Factory method: returns a stream from keyboard input
 stream *stream::stream_from_keyboard_input() {
     // Make a new stream
@@ -191,18 +187,31 @@ stream *stream::stream_from_keyboard_input() {
         new_stream->notifySubscribers(keyinput);
     };
     return new_stream;
-}
+}*/
 
 // Sets up a stream from the keyboard input. Adds 2 subscribers: the first will echo your input back at you, the second will tell you if what you entered is longer than 2 characters.
 int main() {
 
     // this should be a function that takes a subscriber
+    
     std::function<void(subscriber my_subscriber)> my_on_subscribe = [](subscriber my_subscriber) {
         for (int i = 101; i < 105; i ++) {
             event e = event(std::to_string(i));
              my_subscriber.on_next(e);
          }
     };
+
+    std::function<void(subscriber my_subscriber)> my_on_subscribe = [](subscriber my_subscriber) {
+
+        for (int i = 0; i < 5; i ++) {
+            string keyinput;
+            cin >> keyinput;
+            //event e = event(std::to_string(i));
+            my_subscriber.on_next(keyinput);
+         }
+    };
+
+
     stream *my_stream = stream::create(my_on_subscribe);
 
     subscriber sub1;
@@ -216,6 +225,7 @@ int main() {
             cout << "The word you entered is longer than 2 characters." << endl;
         };
     };
+
 
     my_stream->subscribe(sub1);
     my_stream->subscribe(sub2);
