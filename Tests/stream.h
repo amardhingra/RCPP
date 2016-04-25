@@ -89,7 +89,7 @@ class stream {
     };
 
     // Test function that 
-    void get_keyboard_input(); 
+    //void get_keyboard_input(); 
 
 };
 

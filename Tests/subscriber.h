@@ -59,7 +59,7 @@ public:
         std::function<void()> completed = simple_on_completed) :
         
         id(usub_id++),
-        on_next(next), 
+        on_next(next),
         on_error(error), 
         on_completed(completed) 
         {};

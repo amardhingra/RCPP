@@ -4,7 +4,9 @@
 
 void func1(event<std::string> event){
     using namespace std;
-    cout << "func 1" << endl;
+    if (event.get_data().size() > 2) {
+            cout << "The word you entered is longer than 2 characters." << endl;
+    };
 }
 
 void func2(event<std::string> event){
@@ -46,7 +48,20 @@ int main(void){
 
     vector<subscriber<string>> slist = {s1, s2, s3, s4};   
     keyboard_stream.register_subscriber(slist); 
-    keyboard_stream.start();
+
+    while(true) {
+        cout << "1" << endl;
+        string keyinput;
+        cin >> keyinput;
+        cout << "2" << endl; 
+        event<string> my_event(keyinput);
+        pool.notify(0, keyinput);
+        cout << "3" << endl;
+        keyboard_stream.change();
+        cout << "4" << endl;
+        keyboard_stream.notify_subscribers(my_event);
+    }
+    //keyboard_stream.start();
 } catch(std::exception &e){
     std::cout << e.what() << std::endl;
 }
