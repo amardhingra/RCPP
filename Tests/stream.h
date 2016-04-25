@@ -100,6 +100,7 @@ class stream {
         return new_stream;
     }*/
 
+    // TODO: returns by value, is that ok?
     static stream<InputType> create(std::function<void(stream<InputType> my_stream)> on_subscribe, subscriber_pool<InputType>* some_pool) {
         stream<InputType> new_stream (some_pool);
         new_stream.on_subscribe = on_subscribe;
@@ -108,7 +109,12 @@ class stream {
 
     //stream<InputType> 
 
+
     std::vector<stream<InputType>> children;
+
+    stream<InputType> map(std::function<event<InputType>(event<InputType>)>);
+
+
 
 
 };

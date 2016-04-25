@@ -58,7 +58,11 @@ int main(void){
 
     /////////////////////
 
+    stream<int> mapped_stream(&pool);
 
+    //std::function<event<InputType>(event<InputType>)> 
+
+    /*
     subscriber_pool<int> pool2;
 
     std::function<void(stream<int> my_stream)> my_on_subscribe2 = [](stream<int> my_stream) {
@@ -78,22 +82,12 @@ int main(void){
     subscriber<int> s4(func4);
 
     int_stream2.register_subscriber({s3, s4});
-    int_stream2.start();
+    int_stream2.start();*/
+
+    //////////////////////////////
 
 
-    
-    /*
-   std::function<void(stream<int> my_stream)> my_on_subscribe2 = [](stream<int> my_stream) {
-        for (int i = 1; i < 7; i ++) {
-            event<int> e(i);
-            my_stream.change();
-            my_stream.notify_subscribers(e);
-            usleep(100);
 
-         }
-    };
-    stream<int> *int_stream2 = stream<int>::create(my_on_subscribe2, pool_ptr2);
-    int_stream2->register_subscriber(s3);*/
 
 /*
     while(true) {
