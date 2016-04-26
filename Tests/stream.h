@@ -23,7 +23,7 @@ template <typename InputType, typename OutputType = InputType>
     // The threadpool that is assigned to this stream. If none are specified then it gets initialized??
     //seems like there would be ownership problems with this model
        subscriber_pool<InputType> *thread_pool; 
-
+       bool owner;
    public:
 
 /*
@@ -43,21 +43,25 @@ template <typename InputType, typename OutputType = InputType>
     public:
     //default constructor, will eventually take from a source. 
         stream(){
-#ifdef DEBUG
-            std::cout << "calling stream default constructor" << std::endl;
-#endif
-            subscriber_pool<InputType> pool(2);
-            thread_pool = &pool;
+            owner = true;
+            thread_pool = new subscriber_pool<InputType>;//<InputType> pool(2);
             id++;
+
         }; 
 
     //you can specify a specific subscriber_pool
         stream(subscriber_pool<InputType>* some_pool) {
+            owner = false;
             thread_pool = some_pool; 
             id++;
-        };  
+        };
 
-        ~stream(){}; 
+        ~stream(){
+            // if(owner && thread_pool != nullptr){
+            //      delete thread_pool;
+            //      thread_pool = nullptr;
+            // }
+        }; 
 
     // Factory method: returns a stream from keyboard input
     //static stream *stream_from_keyboard_input(subscriber_pool* pool);
@@ -71,6 +75,7 @@ template <typename InputType, typename OutputType = InputType>
             thread_pool->register_subscriber(new_subscriber, id);
         };
         void register_subscriber(std::vector<subscriber<InputType>> new_subscribers){
+
             for (subscriber<InputType> new_subscriber : new_subscribers )
                 thread_pool->register_subscriber(new_subscriber, id);
         };
