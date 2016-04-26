@@ -39,6 +39,9 @@ test-2-streams-share-pool-failing: test-2-streams-share-pool-failing.cpp stream.
 test-2-streams-diff-pools-failing: test-2-streams-diff-pools-failing.cpp stream.h subscriber.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-2-streams-diff-pools-failing.cpp -o test-2-streams-diff-pools-failing.out
 
+test-2-streams-diff-pools-failing2: test-2-streams-diff-pools-failing2.cpp stream.h subscriber.h
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-2-streams-diff-pools-failing2.cpp -o test-2-streams-diff-pools-failing2.out
+
 
 
 .PHONY: clean
