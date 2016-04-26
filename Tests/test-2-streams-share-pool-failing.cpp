@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "stream.h"
 #include "event.h"
 #include "subscriber.h"
@@ -49,9 +51,8 @@ int main(void){
     stream<int> stream1(&pool);
     stream1.on_start = my_on_start;
 
-    subscriber<int> s1(func1_you_entered_int); 
+    subscriber<int> s1(func1_you_entered_int);
     stream1.register_subscriber(s1); 
-
     // defining stream 2
 
     stream<int> stream2(&pool);
@@ -59,9 +60,9 @@ int main(void){
     subscriber<int> s2(func2_you_entered_int);
     stream2.st_register_subscriber(s2);
 
+
     // start stream 1
     stream1.start();
 
-	
     return 0;
 }

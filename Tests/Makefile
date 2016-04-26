@@ -10,7 +10,7 @@ LDFLAGS = -L/usr/local/lib -lboost_thread-mt -lboost_system
 LDLIBS = 
 
 
-executables: helloworld test test-fast-events-failing test-stream-constructor-failing test-2-streams-share-pool-failing
+executables: helloworld test test-2-streams-share-pool-failing2 test-2-streams-diff-pools-failing test-2-streams-diff-pools-failing2
 $(objects): stream.h subscriber.h
 
 debug: CXXFLAGS += -DDEBUG -g
@@ -49,7 +49,7 @@ test-2-streams-diff-pools-failing2: test-2-streams-diff-pools-failing2.cpp strea
 
 .PHONY: clean
 clean:
-	rm -f *~ *.o helloworld2 helloworld a.out subscriber test *.out
+	rm -rf *~ *.o helloworld2 helloworld test-fast-events-failing a.out subscriber test *.out *.dSYM
 
 .PHONY: all
 all: clean executables

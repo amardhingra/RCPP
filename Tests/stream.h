@@ -3,6 +3,7 @@
 
 #include "subscriber.h"
 #include "event.h"
+#include <unistd.h>
 
 typedef unsigned long stream_id;
 /*

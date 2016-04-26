@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "stream.h"
 #include "event.h"
 #include "subscriber.h"

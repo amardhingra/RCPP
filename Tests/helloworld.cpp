@@ -190,7 +190,7 @@ int main() {
          }
     };
 
-    std::function<void(subscriber my_subscriber)> my_on_subscribe = [](subscriber my_subscriber) {
+    std::function<void(subscriber my_subscriber)> my_on_subscribe2 = [](subscriber my_subscriber) {
 
         for (int i = 0; i < 5; i ++) {
             string keyinput;

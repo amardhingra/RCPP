@@ -169,6 +169,7 @@ private:
             }
 
             subscriber<T> sub = subscribers.at(ev.s_id);
+
             sub_lock.unlock();
             sub.on_next(ev.s_event);
         }
@@ -184,6 +185,7 @@ public:
 
     // constructor with default concurrency level set to 1
     subscriber_pool(int concurrency = 1){
+
         // never make more than 16 threads
         int max = concurrency > 16 ? 16 : concurrency;
 
@@ -191,6 +193,10 @@ public:
         for(int i = 0; i < max; i++){
             pool.push_back(std::thread(&subscriber_pool<T>::handle_event, this));
         }
+
+#ifdef DEBUG
+        std::cout << "Constructed pool" << std::endl;
+#endif
     };
 
     // destructor
@@ -210,7 +216,6 @@ public:
 
     // called to pass a new subscriber_event to subscriber given by sub_id
     void notify(sub_id id, event<T> event){
-
         // create an event to add to the queue
         struct queue_event ev(id, event);
 
@@ -285,9 +290,9 @@ public:
         //TODO: it'll hang here forever if you make the stream using stream's default constructor
         // lock the subscriber pool
         while(!sub_lock.try_lock());
-           // std::cout << "trying to get lock" << std::endl;
+        // std::cout << "trying to get lock" << std::endl;
 
-       // std::cout << "got the lock" << std::endl;
+        // std::cout << "got the lock" << std::endl;
 
         // add a stream_id mapping
         subscribers.insert(std::pair<sub_id, subscriber<T>>(sub.id, sub));
