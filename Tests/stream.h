@@ -43,7 +43,9 @@ class stream {
     public:
     //default constructor, will eventually take from a source. 
     stream(){
+#ifdef DEBUG
         std::cout << "calling stream default constructor" << std::endl;
+#endif
         subscriber_pool<InputType> pool(2);
         thread_pool = &pool;
         id++;
@@ -116,18 +118,31 @@ class stream {
     std::vector<subscriber<InputType>> st_my_subscribers;
 
     void st_register_subscriber(const subscriber<InputType> & new_subscriber){
-        std::cout << "REGISTRATION TIME " << this << " " << st_my_subscribers.size() << "\n";
+#ifdef DEBUG
+        std::cout << "registering to stream " << this << ". # of subscribers = " << st_my_subscribers.size() << "\n";
+#endif
         st_my_subscribers.push_back(new_subscriber);
 
-        std::cout << "REGISTRATION TIME " << this << " "
-        << st_my_subscribers.size() << "\n";
+#ifdef DEBUG
+        std::cout << "finished registering to stream " << this << ". # of subscribers = " << st_my_subscribers.size() << "\n";
+
+#endif
     };
 
 
     void st_notify_subscribers(event<InputType> new_event) {
+#ifdef DEBUG
+
         std::cout << "stream " << this <<  " notifying " <<st_my_subscribers.size() << " subscribers" << std::endl;
+#endif
+
+
             for (subscriber<InputType> my_subscriber : st_my_subscribers) {
+#ifdef DEBUG
+
                 std::cout << "stream " << this <<  " trying to notify subscriber " << my_subscriber.id << std::endl;
+#endif
+
                    my_subscriber.on_next(new_event);
 
             }
@@ -154,13 +169,20 @@ class stream {
 
     void notify_children(event<InputType> e) {
         for (stream<InputType> *child_stream : children) {
+#ifdef DEBUG
+
             std::cout << "notifying child stream " <<  child_stream << std::endl;
+#endif
+
             child_stream->on_receive_event_from_parent(e);
         }
     }
 
     void on_receive_event_from_parent(event<InputType> e) {
+#ifdef DEBUG
         std::cout << "stream " << this << " received event" << std::endl;
+#endif
+
         event<int> new_e = event<int>(2);
         st_notify_subscribers(new_e);
         /*

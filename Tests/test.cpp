@@ -46,7 +46,7 @@ int main(void){
 
     using namespace std;
 
-#ifdef DDEBUG
+#ifdef DEBUG
     cout << "debug on" << endl;
 #endif
 
@@ -56,11 +56,14 @@ int main(void){
         for (int i = 1; i < 4; i ++) {
            // std::cout << "1" << endl;
             event<int> e(i);
-            //my_stream.change();
+#ifdef DEBUG
             std::cout << "stream: notifying children......" << endl;
+#endif
             my_stream.notify_children(e);
-            
+
+#ifdef DEBUG
             std::cout << "stream: notifying subscribers....." << endl;
+#endif
             my_stream.st_notify_subscribers(e);
            // usleep(100);
 
