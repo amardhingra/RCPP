@@ -4,10 +4,10 @@
 
 /* BUGS:
 1. stream1 defined before stream2. they share same pool. stream2 starts, then stream1 starts. stream1 and 2 both fire events, but only stream2's subscribers get called, even for stream1's events.
-2. stream1 defined before stream2. they have different pools. stream2 starts, then stream1 starts. stream2's events fire and get handled by its subscribers. when stream1 tries to start, program crashes w/ "libc++abi.dylib: terminating with uncaught exception of type std::out_of_range: map::at:  key not found
+2. DONE stream1 defined before stream2. they have different pools. stream2 starts, then stream1 starts. stream2's events fire and get handled by its subscribers. when stream1 tries to start, program crashes w/ "libc++abi.dylib: terminating with uncaught exception of type std::out_of_range: map::at:  key not found
 Abort trap: 6"
-3. stream1 is defined and some subscribers are added to it, then stream2 is defined and some subscribers are added. they share a pool. then stream1 starts. it fires stream1's events, but calling stream2's handlers.
-4. same as #3 but they use different pools. program will crash with "libc++abi.dylib: terminating with uncaught exception of type std::out_of_range: map::at:  key not found"
+3. DONE stream1 is defined and some subscribers are added to it, then stream2 is defined and some subscribers are added. they share a pool. then stream1 starts. it fires stream1's events, but calling stream2's handlers.
+4. DONE same as #3 but they use different pools. program will crash with "libc++abi.dylib: terminating with uncaught exception of type std::out_of_range: map::at:  key not found"
 */
 
 void greater_than_3(event<int> event){
