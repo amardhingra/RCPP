@@ -42,6 +42,10 @@ event<int> map_func1(event<int> event) {
     return event<int>(3*event.get_data());
 }*/
 
+void func5(stream<int>) {
+    cout << "lol" << endl;
+}
+
 int main(void){
 
     using namespace std;
@@ -70,7 +74,9 @@ int main(void){
          }
     };
 
-    stream<int> int_stream = stream<int>::create(my_on_start, &pool);
+   // stream<int> int_stream = stream<int>::create(my_on_start, &pool);
+
+    stream<int> int_stream = stream<int>::create(func5, &pool);
 
     subscriber<int> s1(greater_than_3); 
     subscriber<int> s2(you_entered_int);
