@@ -181,6 +181,9 @@ public:
         }
 
         void on_receive_event_from_parent(event<InputType> e) {
+#ifdef DEBUG
+            std::cout << "stream " << this << " received event" << std::endl;
+#endif
             if (map_func != NULL) {
                 e = map_func(e);
             }

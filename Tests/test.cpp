@@ -24,6 +24,11 @@ void func3_you_entered_int(event<int> event){
     cout << "func3: you entered " << event.get_data() << endl;
 }
 
+void func4_you_entered_int(event<int> event){
+    using namespace std;
+    cout << "func4: you entered " << event.get_data() << endl;
+}
+
 void func3(event<int> event){
     using namespace std;
     cout << "func 3" << endl;
@@ -75,6 +80,7 @@ int main(void){
 
     mapped_stream.register_subscriber(s2);
 
+/////
     auto mapped_stream2 = int_stream.map(
                 [](event<int> e) -> event<int> {
              return event<int>(100+ e.get_data());
@@ -84,6 +90,19 @@ int main(void){
     subscriber<int> s3(func3_you_entered_int);
 
     mapped_stream2.register_subscriber(s3);
+
+
+ auto mapped_stream3 = int_stream.map(
+                [](event<int> e) -> event<int> {
+             return event<int>(1000+ e.get_data());
+         }
+    );
+
+    subscriber<int> s4(func4_you_entered_int);
+
+    mapped_stream3.register_subscriber(s4);
+
+
 
 
     int_stream.start();
