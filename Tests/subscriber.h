@@ -37,6 +37,10 @@ public:
     // function that is called when the stream generates new data
     std::function<void(event<T>)> on_next;
 
+    std::function<void(event<T>)> julie_on_next;
+
+
+
     // function that is called when the stream encounters an error
     std::function<void(std::exception)> on_error;
 
@@ -280,10 +284,10 @@ public:
 
         //TODO: it'll hang here forever if you make the stream using stream's default constructor
         // lock the subscriber pool
-        while(!sub_lock.try_lock())
-            std::cout << "trying to get lock" << std::endl;
+        while(!sub_lock.try_lock());
+           // std::cout << "trying to get lock" << std::endl;
 
-        std::cout << "got the lock" << std::endl;
+       // std::cout << "got the lock" << std::endl;
 
         // add a stream_id mapping
         subscribers.insert(std::pair<sub_id, subscriber<T>>(sub.id, sub));

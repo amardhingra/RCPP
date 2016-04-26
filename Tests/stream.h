@@ -25,6 +25,9 @@ class stream {
     subscriber_pool<InputType> *thread_pool; 
 
     public:
+
+    int julie_id;
+
     void change(){
         changed = true;
     };
@@ -109,10 +112,67 @@ class stream {
 
     //stream<InputType> 
 
+    std::vector<subscriber<InputType>> st_my_subscribers;
+
+    void st_register_subscriber(subscriber<InputType> new_subscriber){
+        st_my_subscribers.push_back(new_subscriber);
+    };
+
+
+    void st_notify_subscribers(event<InputType> new_event) {
+      //  if (this->has_changed()) {
+            for (subscriber<InputType> my_subscriber : st_my_subscribers) {
+                std::cout << "trying to notify subscriber " << my_subscriber.id << std::endl;
+                if (my_subscriber.on_next) {
+                    std::cout << "on_next exists" << std::endl;
+                   my_subscriber.on_next(new_event);
+                }
+
+                if (my_subscriber.julie_on_next) {
+                    std::cout << "julie_on_next exists" << std::endl;
+
+                    my_subscriber.julie_on_next(new_event);
+                }
+            }
+        //    clear_changed();
+        //}
+    }
+
+
+
+
 
     std::vector<stream<InputType>> children;
 
+    std::function<event<InputType>(event<InputType>)> map_func;
+
     stream<InputType> map(std::function<event<InputType>(event<InputType>)>);
+
+    void notify_children(event<InputType> e) {
+        for (stream<InputType> child_stream : children) {
+            std::cout << "notifying child stream " << child_stream.julie_id << std::endl;
+            child_stream.on_receive_event_from_parent(e);
+        }
+    }
+
+    void on_receive_event_from_parent(event<InputType> e) {
+        std::cout << "on receive event" << std::endl;
+        if (map_func != NULL) {
+            std::cout << "map is not null" << std::endl;
+          //  map_func(e);
+            //event<InputType> new_e = map_func(e);
+            event<int> new_e = event<int>(2);
+            st_notify_subscribers(new_e);
+
+        }
+        else {
+          //  std::cout << "map is null" << std::endl;
+
+            st_notify_subscribers(e);
+
+        }
+
+    };
 
 
 
