@@ -17,14 +17,14 @@ void greater_than_3(event<int> event){
     };
 }
 
-void you_entered_int(event<int> event){
+void func1_you_entered_int(event<int> event){
     using namespace std;
-    cout << "you entered " << event.get_data() << endl;
+    cout << "func1: you entered " << event.get_data() << endl;
 }
 
-void you_entered_int2(event<int> event){
+void func2_you_entered_int(event<int> event){
     using namespace std;
-    cout << "2 you entered " << event.get_data() << endl;
+    cout << "func2: you entered " << event.get_data() << endl;
 }
 
 void func3(event<int> event){
@@ -43,8 +43,9 @@ event<int> map_func1(event<int> event) {
 }*/
 
 void func5(stream<int>) {
-    cout << "lol" << endl;
+    std::cout << "lol" << std::endl;
 }
+
 
 int main(void){
 
@@ -74,10 +75,10 @@ int main(void){
          }
     };
 
-   // stream<int> int_stream = stream<int>::create(my_on_start, &pool);
+    stream<int> int_stream = stream<int>::create(my_on_start, &pool);
 
-    stream<int> int_stream = stream<int>::create(func5, &pool);
-
+   // stream<int> int_stream = stream<int>::create(func5, &pool);
+   
     subscriber<int> s1(greater_than_3); 
     subscriber<int> s2(you_entered_int);
 

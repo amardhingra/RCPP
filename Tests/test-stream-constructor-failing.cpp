@@ -22,7 +22,7 @@ int main(void){
     subscriber_pool<int> pool;
     subscriber_pool<int>* pool_ptr = &pool;
 
-    std::function<void(stream<int> my_stream)> my_on_start = [](stream<int> my_stream) {
+    std::function<void(stream<int> & my_stream)> my_on_start = [](stream<int> & my_stream) {
         for (int i = 1; i < 7; i ++) {
             //event<std::string> e = event<std::string>(std::to_string(i));
             event<int> e(i);

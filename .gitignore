@@ -53,4 +53,6 @@ DerivedData
 # #CocoaPods
 Pods
 
-
+# generated files
+*.dSYM
+*.plist

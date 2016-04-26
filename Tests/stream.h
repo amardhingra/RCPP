@@ -109,6 +109,9 @@ template <typename InputType, typename OutputType = InputType>
         return new_stream;
     }*/
 
+        // disable copy constructor
+        stream(const stream& stream_to_copy) = delete;
+
         std::function<void(stream<InputType> & my_stream)> on_start;
 
 

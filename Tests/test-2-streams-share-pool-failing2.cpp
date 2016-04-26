@@ -89,7 +89,7 @@ int main(void){
     stream2.register_subscriber(s2); 
     
     stream1.start();
-    stream2.start();
+  //  stream2.start();
 
 
     return 0;
