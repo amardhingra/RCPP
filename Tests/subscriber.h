@@ -37,6 +37,10 @@ public:
     // function that is called when the stream generates new data
     std::function<void(event<T>)> on_next;
 
+   // std::function<void(event<T>)> julie_on_next;
+
+
+
     // function that is called when the stream encounters an error
     std::function<void(std::exception)> on_error;
 
@@ -59,14 +63,14 @@ public:
         std::function<void()> completed = simple_on_completed) :
         
         id(usub_id++),
-        on_next(next), 
+        on_next(next),
         on_error(error), 
         on_completed(completed) 
         {};
 
     // copy constructor
     subscriber(const subscriber &sub) :
-        id(usub_id++),
+        id(sub.id),
         on_next(sub.on_next), 
         on_error(sub.on_error), 
         on_completed(sub.on_completed)
@@ -78,7 +82,7 @@ public:
 
     // move constructor
     subscriber(subscriber &&sub) :
-        id(usub_id),
+        id(sub.id),
         on_next(sub.on_next), 
         on_error(sub.on_error), 
         on_completed(sub.on_completed) {
@@ -110,12 +114,14 @@ private:
     public:
         sub_id           s_id;
         event<T>         s_event;
-        queue_event(sub_id _id, event<T> _event) : s_id(_id), s_event(_event) {};
+        queue_event(sub_id _id, event<T> _event) : s_id(_id), s_event(_event) {
+            
+        };
     };
 
     bool                                   end = false; // tells threads when to exit
     sub_id                                 id = 0; // used for sequentially registering subscribers with unique ids
-    std::map<sub_id, subscriber<T>&>       subscribers; // maintains a map of subscribers for fast lookup
+    std::map<sub_id, subscriber<T>>       subscribers; // maintains a map of subscribers for fast lookup
     std::list<queue_event>                 events; // list of events to be processed
     std::mutex                             e_lock; // used to syncronize access to list
     std::condition_variable                e_cond; // used to let worker threads sleep
@@ -161,9 +167,10 @@ private:
                 sub_lock.unlock();
                 continue;
             }
-            subscriber<T> sub = subscribers.at(ev.s_id);
-            sub_lock.unlock();
 
+            subscriber<T> sub = subscribers.at(ev.s_id);
+
+            sub_lock.unlock();
             sub.on_next(ev.s_event);
         }
     };
@@ -178,6 +185,7 @@ public:
 
     // constructor with default concurrency level set to 1
     subscriber_pool(int concurrency = 1){
+
         // never make more than 16 threads
         int max = concurrency > 16 ? 16 : concurrency;
 
@@ -185,6 +193,10 @@ public:
         for(int i = 0; i < max; i++){
             pool.push_back(std::thread(&subscriber_pool<T>::handle_event, this));
         }
+
+#ifdef DEBUG
+        std::cout << "Constructed pool" << std::endl;
+#endif
     };
 
     // destructor
@@ -204,13 +216,14 @@ public:
 
     // called to pass a new subscriber_event to subscriber given by sub_id
     void notify(sub_id id, event<T> event){
-
         // create an event to add to the queue
         struct queue_event ev(id, event);
 
         // lock the queue and add the event to it
         std::unique_lock<std::mutex> lk(e_lock);
+        
         events.push_back(ev);
+
         lk.unlock();
 
         // wake up any worker threads
@@ -260,12 +273,12 @@ public:
 
     // used to register a subscriber with the current subscriber_pool
     void register_subscriber(subscriber<T> sub){
-        
+
         // lock the subscriber pool
         while(!sub_lock.try_lock());
         
         // OLD: add the subscriber to the map
-        subscribers.insert(std::pair<sub_id, subscriber<T>&>(id, sub));
+        subscribers.insert(std::pair<sub_id, subscriber<T>>(id, sub));
         
         // unlock the subscriber pool
         sub_lock.unlock();
@@ -274,11 +287,15 @@ public:
     // used to register a subscriber and indicate the stream it is associated with
     void register_subscriber(subscriber<T> sub, stream_id id){
 
+        //TODO: it'll hang here forever if you make the stream using stream's default constructor
         // lock the subscriber pool
         while(!sub_lock.try_lock());
-        
+        // std::cout << "trying to get lock" << std::endl;
+
+        // std::cout << "got the lock" << std::endl;
+
         // add a stream_id mapping
-        subscribers.insert(std::pair<sub_id, subscriber<T>&>(sub.id, sub));
+        subscribers.insert(std::pair<sub_id, subscriber<T>>(sub.id, sub));
         stream_subs[id].push_back(sub.id);
 
         // unlock the subscriber pool
