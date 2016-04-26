@@ -10,13 +10,12 @@ LDFLAGS = -L/usr/local/lib -lboost_thread-mt -lboost_system
 LDLIBS = 
 
 
-executables: helloworld test
-
+executables: helloworld test test-fast-events-failing test-stream-constructor-failing test-2-streams-share-pool-failing
 $(objects): stream.h subscriber.h
 
 debug: CXXFLAGS += -DDEBUG -g
 debug: CCFLAGS += -DDEBUG -g
-debug: clean test
+debug: executables
 
 helloworld: helloworld.cpp stream.h subscriber.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) helloworld.cpp -o helloworld
