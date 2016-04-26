@@ -20,6 +20,10 @@ debug: executables
 helloworld: helloworld.cpp stream.h subscriber.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) helloworld.cpp -o helloworld
 
+debugtest: CXXFLAGS += -DDEBUG -g
+debugtest: CCFLAGS += -DDEBUG -g
+debugtest: test
+
 test: test.cpp stream.h subscriber.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) test.cpp -o test
 

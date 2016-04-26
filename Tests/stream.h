@@ -24,13 +24,13 @@ template <typename InputType, typename OutputType = InputType>
 
     // The threadpool that is assigned to this stream. If none are specified then it gets initialized??
     //seems like there would be ownership problems with this model
-       subscriber_pool<InputType> *thread_pool; 
-       bool owner;
+    subscriber_pool<InputType> *thread_pool; 
+    bool owner;
 
-    public:
+public:
     //default constructor, will eventually take from a source. 
-        stream(){
-            owner = true;
+    stream(){
+        owner = true;
             thread_pool = new subscriber_pool<InputType>;//<InputType> pool(2);
             id++;
         }; 
@@ -102,9 +102,20 @@ template <typename InputType, typename OutputType = InputType>
 
         std::function<void(stream<InputType> & my_stream)> on_start;
 
+        // map 
+        // TODO: should it return by reference instead of value?
+        stream<InputType> map(std::function<event<InputType>(event<InputType>)> new_map_func) {
+            stream<InputType> new_stream;
+            new_stream.map_func = new_map_func;
+            this->children.push_back(&new_stream);
+            return new_stream;
+
+        };
+
 
 
 // functions/members prefixed with "st" are part of a single-threaded system that bypasses thread pool. Use these functions for debugging.
+
         std::vector<subscriber<InputType>> st_my_subscribers;
 
         void st_register_subscriber(const subscriber<InputType> & new_subscriber){
@@ -151,15 +162,6 @@ template <typename InputType, typename OutputType = InputType>
 
         std::function<event<InputType>(event<InputType>)> map_func;
 
-        // map 
-        // TODO: should it return by reference instead of value?
-        stream<InputType> map(std::function<event<InputType>(event<InputType>)> new_map_func) {
-            stream<InputType> new_stream;
-            new_stream.map_func = new_map_func;
-            this->children.push_back(&new_stream);
-            return new_stream;
-
-        };
 
         void notify_children(event<InputType> e) {
             for (stream<InputType> *child_stream : children) {
@@ -180,19 +182,18 @@ template <typename InputType, typename OutputType = InputType>
 
         void on_receive_event_from_parent(event<InputType> e) {
             if (map_func != NULL) {
-                event<InputType> new_e = map_func(e);
-                notify_subscribers(new_e);
+                e = map_func(e);
             }
-            else {
-                notify_subscribers(e);
-            }
+#ifdef DEBUG
+            usleep(100);
+#endif
+            notify_subscribers(e);
         };
 
         void st_on_receive_event_from_parent(event<InputType> e) {
 #ifdef DEBUG
             std::cout << "stream " << this << " received event" << std::endl;
 #endif
-
 
             if (map_func != NULL) {
                 event<InputType> new_e = map_func(e);
