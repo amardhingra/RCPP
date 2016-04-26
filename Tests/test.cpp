@@ -43,34 +43,40 @@ event<int> map_func1(event<int> event) {
 }*/
 
 int main(void){
+
     using namespace std;
+
+#ifdef DDEBUG
+    cout << "debug on" << endl;
+#endif
 
     subscriber_pool<int> pool;
 
-    std::function<void(stream<int> my_stream)> my_on_subscribe = [](stream<int> my_stream) {
-        for (int i = 1; i < 7; i ++) {
+    std::function<void(stream<int> & my_stream)> my_on_subscribe = [](stream<int> & my_stream) {
+        for (int i = 1; i < 4; i ++) {
            // std::cout << "1" << endl;
             event<int> e(i);
-            my_stream.change();
+            //my_stream.change();
+            std::cout << "stream: notifying children......" << endl;
             my_stream.notify_children(e);
+            
+            std::cout << "stream: notifying subscribers....." << endl;
             my_stream.st_notify_subscribers(e);
-            usleep(100);
+           // usleep(100);
 
          }
     };
 
     stream<int> int_stream = stream<int>::create(my_on_subscribe, &pool);
-    int_stream.julie_id = 0;
-    cout << "stream 1 id = " << int_stream.julie_id << endl;
 
     subscriber<int> s1(greater_than_3); 
-    cout << "s1 id = " << s1.id << endl;
+  //  cout << "s1 id = " << s1.id << endl;
 
     subscriber<int> s2(you_entered_int);
-    cout << "s2 id = " << s2.id << endl;
+    cout << "s0 id = " << s2.id << endl;
 
 
-    int_stream.st_register_subscriber(s1); 
+  //  int_stream.st_register_subscriber(s1); 
     int_stream.st_register_subscriber(s2); 
 
 
@@ -82,37 +88,42 @@ int main(void){
      //   subscriber_pool<int> pool3;
 
 
-    stream<int> mapped_stream(&pool);
-    mapped_stream.julie_id = 1;
-    cout << "stream 2 id = " << mapped_stream.julie_id << endl;
+    stream<int> mapped_stream;
+
+    /*
     std::function<event<int>(event<int>)> map_func = [](event<int>) -> event<int> {
         std::cout << "calling map_func " << endl;
         return event<int>(1);
 
-    };
+    };*/
 
-    mapped_stream.map_func = map_func;
+    //mapped_stream.on_subscribe = my_on_subscribe;
 
-    int_stream.children.push_back(mapped_stream);
+   // mapped_stream.map_func = map_func;
 
-   // subscriber<int> s3(you_entered_int2);
-    //subscriber<int> s4(func4);
-    subscriber<int> s3(NULL);
-    s3.julie_on_next = you_entered_int2;
-    cout << "s3 id = " << s3.id << endl;
+    int_stream.children.push_back(&mapped_stream);
+
+    subscriber<int> s3(you_entered_int2);
+ //   subscriber<int> s4(func4);
+  //  subscriber<int> s3(NULL);
+   // s3.julie_on_next = you_entered_int2;
+    cout << "s1 id = " << s3.id << endl;
 
 
     mapped_stream.st_register_subscriber(s3);
-//    mapped_stream.st_register_subscriber(s4);
+    //mapped_stream.st_register_subscriber(s4);
+
+    mapped_stream.print_subscribers();
 
     //s3.on_next(1);
     //s4.on_next(2);
 
 
 
-
+ //   mapped_stream.start();
     int_stream.start();
 
+    mapped_stream.st_notify_subscribers(event<int>(666));
 
    // mapped_stream.
 

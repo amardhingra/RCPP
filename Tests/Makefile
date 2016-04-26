@@ -16,7 +16,7 @@ $(objects): stream.h subscriber.h
 
 debug: CXXFLAGS += -DDEBUG -g
 debug: CCFLAGS += -DDEBUG -g
-debug: clean helloworld
+debug: clean test
 
 helloworld: helloworld.cpp stream.h subscriber.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) helloworld.cpp -o helloworld

@@ -37,7 +37,7 @@ public:
     // function that is called when the stream generates new data
     std::function<void(event<T>)> on_next;
 
-    std::function<void(event<T>)> julie_on_next;
+   // std::function<void(event<T>)> julie_on_next;
 
 
 

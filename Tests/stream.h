@@ -18,7 +18,7 @@ class stream {
     //initially set to 0
 	static stream_id id; 
 
-    bool changed = false;
+    //bool changed = false;
 
     // The threadpool that is assigned to this stream. If none are specified then it gets initialized??
     //seems like there would be ownership problems with this model
@@ -26,8 +26,7 @@ class stream {
 
     public:
 
-    int julie_id;
-
+/*
     void change(){
         changed = true;
     };
@@ -38,7 +37,7 @@ class stream {
 
     bool has_changed(){
         return changed;
-    };
+    };*/
 
 
     public:
@@ -64,7 +63,6 @@ class stream {
     // A function that gets events and notifies subscribers accordingly
     //std::function<void()> get_events_from_source;
 
-    std::function<void(stream<InputType> my_stream)> on_subscribe;
 
     // Add a new subscriber to this stream
     void register_subscriber(subscriber<InputType> new_subscriber){
@@ -78,14 +76,14 @@ class stream {
     // If the stream has changed, then notify all subscribers and clear the "changed" variable to indicate that the stream has no longer changed
     //template<class T> 
     void notify_subscribers(event<InputType> new_event){
-         if (this->has_changed()) {
+         //if (this->has_changed()) {
            // std::cout << "1" << std::endl;
         // auto pool_subscribers = thread_pool->pool;
         // for (subscriber pool_subscriber : pool_subscribers)
         //     pool_subscribers.notify(new_event);
             thread_pool->notify_stream(id, new_event);
-            clear_changed();
-        }
+           // clear_changed();
+        //}
     };
 
     // Starts the stream;
@@ -103,8 +101,11 @@ class stream {
         return new_stream;
     }*/
 
+    std::function<void(stream<InputType> & my_stream)> on_subscribe;
+
+
     // TODO: returns by value, is that ok?
-    static stream<InputType> create(std::function<void(stream<InputType> my_stream)> on_subscribe, subscriber_pool<InputType>* some_pool) {
+    static stream<InputType> create(std::function<void(stream<InputType> & my_stream)> on_subscribe, subscriber_pool<InputType>* some_pool) {
         stream<InputType> new_stream (some_pool);
         new_stream.on_subscribe = on_subscribe;
         return new_stream;
@@ -114,51 +115,57 @@ class stream {
 
     std::vector<subscriber<InputType>> st_my_subscribers;
 
-    void st_register_subscriber(subscriber<InputType> new_subscriber){
+    void st_register_subscriber(const subscriber<InputType> & new_subscriber){
+        std::cout << "REGISTRATION TIME " << this << " " << st_my_subscribers.size() << "\n";
         st_my_subscribers.push_back(new_subscriber);
+
+        std::cout << "REGISTRATION TIME " << this << " "
+        << st_my_subscribers.size() << "\n";
     };
 
 
     void st_notify_subscribers(event<InputType> new_event) {
-      //  if (this->has_changed()) {
+        std::cout << "stream " << this <<  " notifying " <<st_my_subscribers.size() << " subscribers" << std::endl;
             for (subscriber<InputType> my_subscriber : st_my_subscribers) {
-                std::cout << "trying to notify subscriber " << my_subscriber.id << std::endl;
-                if (my_subscriber.on_next) {
-                    std::cout << "on_next exists" << std::endl;
+                std::cout << "stream " << this <<  " trying to notify subscriber " << my_subscriber.id << std::endl;
                    my_subscriber.on_next(new_event);
-                }
 
-                if (my_subscriber.julie_on_next) {
-                    std::cout << "julie_on_next exists" << std::endl;
-
-                    my_subscriber.julie_on_next(new_event);
-                }
             }
         //    clear_changed();
         //}
     }
 
+    void print_subscribers() {
+        std::cout << "subscribers: ";
+        for (subscriber<InputType> my_subscriber : st_my_subscribers) {
+            std::cout << my_subscriber.id << " ";
+        }
+        std::cout << std::endl;
+    }
 
 
 
 
-    std::vector<stream<InputType>> children;
+    std::vector<stream<InputType> *> children;
 
     std::function<event<InputType>(event<InputType>)> map_func;
 
     stream<InputType> map(std::function<event<InputType>(event<InputType>)>);
 
     void notify_children(event<InputType> e) {
-        for (stream<InputType> child_stream : children) {
-            std::cout << "notifying child stream " << child_stream.julie_id << std::endl;
-            child_stream.on_receive_event_from_parent(e);
+        for (stream<InputType> *child_stream : children) {
+            std::cout << "notifying child stream " <<  child_stream << std::endl;
+            child_stream->on_receive_event_from_parent(e);
         }
     }
 
     void on_receive_event_from_parent(event<InputType> e) {
-        std::cout << "on receive event" << std::endl;
+        std::cout << "stream " << this << " received event" << std::endl;
+        event<int> new_e = event<int>(2);
+        st_notify_subscribers(new_e);
+        /*
         if (map_func != NULL) {
-            std::cout << "map is not null" << std::endl;
+        //    std::cout << "map is not null" << std::endl;
           //  map_func(e);
             //event<InputType> new_e = map_func(e);
             event<int> new_e = event<int>(2);
@@ -170,7 +177,7 @@ class stream {
 
             st_notify_subscribers(e);
 
-        }
+        }*/
 
     };
 
