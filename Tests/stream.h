@@ -26,21 +26,6 @@ template <typename InputType, typename OutputType = InputType>
     //seems like there would be ownership problems with this model
        subscriber_pool<InputType> *thread_pool; 
        bool owner;
-   public:
-
-/*
-    void change(){
-        changed = true;
-    };
-
-    void clear_changed(){
-        changed = false;
-    };
-
-    bool has_changed(){
-        return changed;
-    };*/
-
 
     public:
     //default constructor, will eventually take from a source. 
@@ -67,10 +52,6 @@ template <typename InputType, typename OutputType = InputType>
     // Factory method: returns a stream from keyboard input
     //static stream *stream_from_keyboard_input(subscriber_pool* pool);
 
-    // A function that gets events and notifies subscribers accordingly
-    //std::function<void()> get_events_from_source;
-
-
     // Add a new subscriber to this stream
         void register_subscriber(subscriber<InputType> new_subscriber){
             thread_pool->register_subscriber(new_subscriber, id);
@@ -81,49 +62,49 @@ template <typename InputType, typename OutputType = InputType>
                 thread_pool->register_subscriber(new_subscriber, id);
         };
 
-    // If the stream has changed, then notify all subscribers and clear the "changed" variable to indicate that the stream has no longer changed
+    // If the stream has changed, then notify all subscribers
     //template<class T> 
         void notify_subscribers(event<InputType> new_event){
-         //if (this->has_changed()) {
-           // std::cout << "1" << std::endl;
-        // auto pool_subscribers = thread_pool->pool;
-        // for (subscriber pool_subscriber : pool_subscribers)
-        //     pool_subscribers.notify(new_event);
             thread_pool->notify_stream(id, new_event);
-           // clear_changed();
-        //}
         };
+
+        /* --------------JULIE'S MESS BELOW --------------- */
 
     // Starts the stream;
         void start(){
             on_start(*this);
-
         };
 
     // create stream with pool and on_start
     // TODO: create version of this w/o pool arg once stream's default constructor gets fixed
-    /*
-    static stream<InputType> *create(std::function<void(stream<InputType> my_stream)> on_subscribe, subscriber_pool<InputType>* some_pool) {
-        stream *new_stream = new stream(some_pool);
-        new_stream->on_subscribe = on_subscribe;
-        return new_stream;
-    }*/
+
+        //you can specify a specific subscriber_pool
+        stream(subscriber_pool<InputType>* some_pool, const std::function<void(stream<InputType> & my_stream)> & on_start) {
+            owner = false;
+            thread_pool = some_pool; 
+            id++;
+            this->on_start = on_start;
+        };
 
         // disable copy constructor
         stream(const stream& stream_to_copy) = delete;
 
+        // assignment operator just assigns the reference
+        stream& operator=(stream &my_stream){
+            std::cout << "stream: operator= called" << std::endl;
+            return my_stream;
+        };
+
+        // TODO:move constructor
+        stream(stream &&my_stream)  {
+            std::cout << "stream: move constructor called" << std::endl;
+        };
+
         std::function<void(stream<InputType> & my_stream)> on_start;
 
 
-    // TODO: returns by value, is that ok?
-        static stream<InputType> create(std::function<void(stream<InputType> & my_stream)> on_start, subscriber_pool<InputType>* some_pool) {
-            stream<InputType> new_stream (some_pool);
-            new_stream.on_start = on_start;
-            return new_stream;
-        }
 
-    //stream<InputType> 
-
+// functions/members prefixed with "st" are part of a single-threaded system that bypasses thread pool. Use these functions for debugging.
         std::vector<subscriber<InputType>> st_my_subscribers;
 
         void st_register_subscriber(const subscriber<InputType> & new_subscriber){
@@ -160,33 +141,54 @@ template <typename InputType, typename OutputType = InputType>
 
         void print_subscribers() {
             std::cout << "subscribers: ";
-            for (subscriber<InputType> my_subscriber : st_my_subscribers) {
+            for (auto my_subscriber : st_my_subscribers) {
                 std::cout << my_subscriber.id << " ";
             }
             std::cout << std::endl;
         }
 
-
-
-
         std::vector<stream<InputType> *> children;
 
         std::function<event<InputType>(event<InputType>)> map_func;
 
-        stream<InputType> map(std::function<event<InputType>(event<InputType>)>);
+        // map 
+        // TODO: should it return by reference instead of value?
+        stream<InputType> map(std::function<event<InputType>(event<InputType>)> new_map_func) {
+            stream<InputType> new_stream;
+            new_stream.map_func = new_map_func;
+            this->children.push_back(&new_stream);
+            return new_stream;
+
+        };
 
         void notify_children(event<InputType> e) {
             for (stream<InputType> *child_stream : children) {
-#ifdef DEBUG
-
-                std::cout << "notifying child stream " <<  child_stream << std::endl;
-#endif
 
                 child_stream->on_receive_event_from_parent(e);
             }
         }
 
+        void st_notify_children(event<InputType> e) {
+            for (stream<InputType> *child_stream : children) {
+#ifdef DEBUG
+
+                std::cout << "notifying child stream " <<  child_stream << std::endl;
+#endif
+                child_stream->st_on_receive_event_from_parent(e);
+            }
+        }
+
         void on_receive_event_from_parent(event<InputType> e) {
+            if (map_func != NULL) {
+                event<InputType> new_e = map_func(e);
+                notify_subscribers(new_e);
+            }
+            else {
+                notify_subscribers(e);
+            }
+        };
+
+        void st_on_receive_event_from_parent(event<InputType> e) {
 #ifdef DEBUG
             std::cout << "stream " << this << " received event" << std::endl;
 #endif
@@ -197,16 +199,11 @@ template <typename InputType, typename OutputType = InputType>
                 st_notify_subscribers(new_e);
             }
             else {
-          //  std::cout << "map is null" << std::endl;
-
                 st_notify_subscribers(e);
 
             }
 
         };
-
-
-
 
     };
 
