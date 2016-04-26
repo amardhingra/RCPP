@@ -16,7 +16,8 @@ typedef unsigned long stream_id;
 template <typename InputType, typename OutputType = InputType>
    class stream {
     //initially set to 0
-       static stream_id id; 
+    static stream_id unique_id;
+    stream_id id;
 
     //bool changed = false;
 
@@ -46,7 +47,6 @@ template <typename InputType, typename OutputType = InputType>
             owner = true;
             thread_pool = new subscriber_pool<InputType>;//<InputType> pool(2);
             id++;
-
         }; 
 
     //you can specify a specific subscriber_pool
@@ -207,6 +207,6 @@ template <typename InputType, typename OutputType = InputType>
     };
 
 template <typename InputType, typename OutputType>
-    stream_id stream<InputType, OutputType>::id;
+    stream_id stream<InputType, OutputType>::unique_id;
 
 #endif
