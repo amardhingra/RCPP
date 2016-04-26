@@ -52,8 +52,8 @@ int main(void){
 
     subscriber_pool<int> pool;
 
-    std::function<void(stream<int> & my_stream)> my_on_subscribe = [](stream<int> & my_stream) {
-        for (int i = 1; i < 4; i ++) {
+    std::function<void(stream<int> & my_stream)> my_on_start = [](stream<int> & my_stream) {
+        for (int i = 1; i < 7; i ++) {
            // std::cout << "1" << endl;
             event<int> e(i);
 #ifdef DEBUG
@@ -70,65 +70,35 @@ int main(void){
          }
     };
 
-    stream<int> int_stream = stream<int>::create(my_on_subscribe, &pool);
+    stream<int> int_stream = stream<int>::create(my_on_start, &pool);
 
     subscriber<int> s1(greater_than_3); 
-  //  cout << "s1 id = " << s1.id << endl;
-
     subscriber<int> s2(you_entered_int);
-    cout << "s0 id = " << s2.id << endl;
 
 
-  //  int_stream.st_register_subscriber(s1); 
+    int_stream.st_register_subscriber(s1); 
     int_stream.st_register_subscriber(s2); 
-
-
-//    int_stream.start();
-
 
     /////////////////////
 
-     //   subscriber_pool<int> pool3;
-
-
     stream<int> mapped_stream;
-
-    /*
-    std::function<event<int>(event<int>)> map_func = [](event<int>) -> event<int> {
-        std::cout << "calling map_func " << endl;
-        return event<int>(1);
-
-    };*/
-
-    //mapped_stream.on_subscribe = my_on_subscribe;
-
-   // mapped_stream.map_func = map_func;
+    
+    mapped_stream.map_func = [](event<int> e) -> event<int> {
+        return event<int>(2 * e.get_data());
+    };
 
     int_stream.children.push_back(&mapped_stream);
 
     subscriber<int> s3(you_entered_int2);
  //   subscriber<int> s4(func4);
-  //  subscriber<int> s3(NULL);
-   // s3.julie_on_next = you_entered_int2;
-    cout << "s1 id = " << s3.id << endl;
-
 
     mapped_stream.st_register_subscriber(s3);
     //mapped_stream.st_register_subscriber(s4);
 
-    mapped_stream.print_subscribers();
+  //  mapped_stream.print_subscribers();
 
-    //s3.on_next(1);
-    //s4.on_next(2);
-
-
-
- //   mapped_stream.start();
     int_stream.start();
 
-    mapped_stream.st_notify_subscribers(event<int>(666));
-
-   // mapped_stream.
 
 
 
@@ -137,7 +107,7 @@ int main(void){
     /*
     subscriber_pool<int> pool2;
 
-    std::function<void(stream<int> my_stream)> my_on_subscribe2 = [](stream<int> my_stream) {
+    std::function<void(stream<int> my_stream)> my_on_start2 = [](stream<int> my_stream) {
         for (int i = 2; i < 5; i ++) {
            // std::cout << "2" << endl;
             event<int> e(i);
@@ -148,7 +118,7 @@ int main(void){
          }
     };
 
-    stream<int> int_stream2 = stream<int>::create(my_on_subscribe2, &pool2);
+    stream<int> int_stream2 = stream<int>::create(my_on_start2, &pool2);
 
     subscriber<int> s3(func3);
     subscriber<int> s4(func4);

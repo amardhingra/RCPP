@@ -21,11 +21,10 @@ int main(void){
     subscriber_pool<int> pool;
     subscriber_pool<int>* pool_ptr = &pool;
 
-    std::function<void(stream<int> my_stream)> my_on_subscribe = [](stream<int> my_stream) {
+    std::function<void(stream<int> my_stream)> my_on_start = [](stream<int> my_stream) {
         for (int i = 1; i < 7; i ++) {
             //event<std::string> e = event<std::string>(std::to_string(i));
             event<int> e(i);
-            my_stream.change();
             my_stream.notify_subscribers(e);
             usleep(100);
 
@@ -43,7 +42,7 @@ int main(void){
     // this fails
     stream<int> int_stream;
 
-    int_stream.on_subscribe = my_on_subscribe;
+    int_stream.on_start = my_on_start;
 
     subscriber<int> s1(greater_than_3);
     subscriber<int> s2(you_entered_int);

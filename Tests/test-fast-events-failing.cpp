@@ -29,7 +29,6 @@ int main(void){
 
     for (int i = 100; i < 105; i ++) {
         event<std::string> e = event<std::string>(std::to_string(i));
-        keyboard_stream.change();
         keyboard_stream.notify_subscribers(e);
         
         // Description of bug: events get lost if I don't call sleep after each event is fired. 
