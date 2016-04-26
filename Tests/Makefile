@@ -26,18 +26,22 @@ test: test.cpp stream.h subscriber.h
 
 # failing test
 test-fast-events-failing: test-fast-events-failing.cpp stream.h subscriber.h
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-fast-events-failing.cpp -o test-fast-events-failing
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-fast-events-failing.cpp -o test-fast-events-failing.out
 
 # failing test
 test-stream-constructor-failing: test-stream-constructor-failing.cpp stream.h subscriber.h
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-stream-constructor-failing.cpp -o test-stream-constructor-failing
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-stream-constructor-failing.cpp -o test-stream-constructor-failing.out
+
+# failing test
+test-2-streams-share-pool-failing: test-2-streams-share-pool-failing.cpp stream.h subscriber.h
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-2-streams-share-pool-failing.cpp -o test-2-streams-share-pool-failing.out
 
 
 
 
 .PHONY: clean
 clean:
-	rm -f *~ *.o helloworld2 helloworld a.out subscriber test test-fast-events-failing test-stream-constructor-failing
+	rm -f *~ *.o helloworld2 helloworld a.out subscriber test *.out
 
 .PHONY: all
 all: clean executables
