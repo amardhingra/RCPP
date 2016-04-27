@@ -45,6 +45,7 @@ public:
     // 
     ~stream(){
         // wait for the stream to finish
+        std::cout << &t << std::endl;
         complete();
     };
 
