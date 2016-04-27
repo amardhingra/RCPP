@@ -108,6 +108,24 @@ public:
             //other.id = 0;
         };
 
+        // move assignment
+        stream& operator=(stream&& other){
+            if (this != &other)
+            {
+                // Free the existing resource.
+                delete thread_pool;
+
+                // Copy the thread_pool pointer and its id from the source object.
+                thread_pool = other.thread_pool;
+                id = other.id;
+
+                 // Release the thread_pool pointer from the source object so that
+                // the destructor does not free the memory multiple times.
+                other.thread_pool = nullptr;
+            }
+            return *this;
+        }
+
         std::function<void(stream<InputType> & my_stream)> on_start;
 
         // map 
