@@ -11,63 +11,60 @@
 
 typedef unsigned long stream_id;
 /*
-   A stream emits data for subscribers to the stream to handle.
-   A stream can have many subscribers.
-   */
+ * A stream emits data for subscribers to the stream to handle.
+ * A stream can have many subscribers.
+ */
 
-//namespace {class subscriber_pool; }
-//namespace {class subscriber; }
 
 template <typename InputType, typename OutputType = InputType>
-   class stream {
+class stream {
 
 private:
-    //initially set to 0
-    static stream_id unique_id;
-    stream_id id;
 
+    static stream_id            unique_id;   // unique id generator for streams
+    stream_id                   id;          // specific id for instance of stream
+    subscriber_pool<InputType> *thread_pool; // subscriber pool to use for handling events
+    bool                        owner;       // determines if the current object is the owner of the pool
+    std::thread                 t;           // thread on which to run the on_start function
     //bool changed = false;
 
-    // The threadpool that is assigned to this stream. If none are specified then it gets initialized??
-    //seems like there would be ownership problems with this model
-    subscriber_pool<InputType> *thread_pool; 
-    bool owner;
 
 public:
-    //default constructor, will eventually take from a source. 
-    stream(){
-        owner = true;
-            thread_pool = new subscriber_pool<InputType>;//<InputType> pool(2);
-            id++;
-        }; 
+    // default constructor
+    stream() : 
+        id(unique_id++),
+        thread_pool(new subscriber_pool<InputType>),
+        owner(true)
+        {}; 
 
-    //you can specify a specific subscriber_pool
-        stream(subscriber_pool<InputType>* some_pool) {
-            owner = false;
-            thread_pool = some_pool; 
-            id++;
-        };
+    // constructor with shared thread pool
+    stream(subscriber_pool<InputType>* some_pool) :
+        id(unique_id++),
+        thread_pool(some_pool),
+        owner(false)
+        {};
 
-        ~stream(){
-            complete();
-            // if(owner && thread_pool != nullptr){
-            //      delete thread_pool;
-            //      thread_pool = nullptr;
-            // }
-        }; 
+    ~stream(){
+        // wait for the stream to finish
+        complete();
 
-    // Factory method: returns a stream from keyboard input
-    //static stream *stream_from_keyboard_input(subscriber_pool* pool);
+        // check if we are the owner of the thread and delete it
+        if(owner && thread_pool != nullptr){
+             delete thread_pool;
+             thread_pool = nullptr;
+        }
+    }; 
+
 
     // Add a new subscriber to this stream
-        void register_subscriber(subscriber<InputType> new_subscriber){
-            thread_pool->register_subscriber(new_subscriber, id);
-        };
-        void register_subscriber(std::vector<subscriber<InputType>> new_subscribers){
+    void register_subscriber(subscriber<InputType> new_subscriber){
+        thread_pool->register_subscriber(new_subscriber, id);
+    };
+    void register_subscriber(std::vector<subscriber<InputType>> new_subscribers){
 
-            for (subscriber<InputType> new_subscriber : new_subscribers )
-                thread_pool->register_subscriber(new_subscriber, id);
-        };
+        for (subscriber<InputType> new_subscriber : new_subscribers )
+            thread_pool->register_subscriber(new_subscriber, id);
+    };
 
     // If the stream has changed, then notify all subscribers
     //template<class T> 
@@ -77,8 +74,6 @@ public:
 
         /* --------------JULIE'S MESS BELOW --------------- */
 
-private:
-        std::thread t;
 public:
     // Starts the stream;
         void start(){
