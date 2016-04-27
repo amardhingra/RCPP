@@ -19,21 +19,21 @@ int main(void){
     using namespace std;
 
 
-    subscriber_pool<int> pool;
-    subscriber_pool<int>* pool_ptr = &pool;
+    shared_ptr<subscriber_pool<int>> pool(new subscriber_pool<int>);
+    //subscriber_pool<int>* pool_ptr = &pool;
 
     std::function<void(stream<int> & my_stream)> my_on_start = [](stream<int> & my_stream) {
         for (int i = 1; i < 7; i ++) {
             //event<std::string> e = event<std::string>(std::to_string(i));
             event<int> e(i);
-            my_stream.notify_subscribers(e);
+            my_stream.notify(e);
             usleep(100);
 
          }
     };
 
     // this works
-    // stream<int> int_stream(pool_ptr);
+    //stream<int> int_stream(pool);
 
     // Description of bug: Using default stream constructor results in hang when you try to register_subscriber on that stream. 
     // Correct behavior: should print numbers from 1-6; printing out each number; telling you if the number is greater than 3.

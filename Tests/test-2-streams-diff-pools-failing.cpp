@@ -37,13 +37,13 @@ int main(void){
     using namespace std;
 
     // stream1's pool
-    subscriber_pool<int> pool1;
+    shared_ptr<subscriber_pool<int>> pool1(new subscriber_pool<int>);
 
     // stream1's definition
     std::function<void(stream<int> & my_stream)> my_on_start = [](stream<int> & my_stream) {
         for (int i = 1; i < 6; i ++) {
             event<int> e(i);
-            my_stream.notify_subscribers(e);
+            my_stream.notify(e);
             usleep(100);
          }
     };
@@ -58,7 +58,7 @@ int main(void){
 
     // constructing stream 2 with its own pool
     subscriber_pool<int> pool2;
-    stream<int> stream2(&pool2);
+    shared_ptr<subscriber_pool<int>> pool2(new subscriber_pool<int>);
 
     // stream2's subscriber
     subscriber<int> s2(func2_you_entered_int);

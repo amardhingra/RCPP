@@ -54,9 +54,9 @@ public:
     // assignment operator just assigns the reference
     stream& operator=(stream &my_stream){
         
-        #ifdef
+        //#ifdef 
         std::cout << "stream: operator= called" << std::endl;
-        #endif
+        //#endif
         
         return my_stream;
     };
@@ -66,9 +66,9 @@ public:
         id(other.id),
         thread_pool(other.thread_pool){
         
-        #ifdef
+        //#ifdef
         std::cout << "stream: move constructor called" << std::endl;
-        #endif
+        //#endif
         
         other.thread_pool = nullptr;
     };
@@ -137,7 +137,7 @@ public:
 
 public:
 
-    stream<InputType> filter(std::function<event<InputType>(event<InputType>) filter_func){
+    stream<InputType> filter(std::function<event<InputType>(event<InputType>)> filter_func){
         // TODO
     }
 
@@ -149,7 +149,7 @@ public:
 
     };
 
-    stream<InputType> reduce(std::function<event<InputType>(event<InputType>) filter_func){
+    stream<InputType> reduce(std::function<event<InputType>(event<InputType>)> filter_func){
         // TODO
     }
 
