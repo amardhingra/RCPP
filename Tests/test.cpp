@@ -26,18 +26,9 @@ void func4_you_entered_int(event<int> event){
     cout << "func4: you entered " << event.get_data() << endl;
 }
 
-void func3(event<int> event){
+void func5_you_entered_int(event<int> event){
     using namespace std;
-    cout << "func 3" << endl;
-}
-
-void func4(event<int> event){
-    using namespace std;
-    cout << "func 4" << endl;
-}
-
-void func5(stream<int>) {
-    std::cout << "lol" << std::endl;
+    cout << "func5: you entered " << event.get_data() << endl;
 }
 
 
@@ -49,7 +40,6 @@ int main(void){
 
     auto my_on_start = [&int_stream]() {
         for (int i = 1; i < 2; i ++) {
-           // std::cout << "1" << endl;
             event<int> e(i);
             int_stream.notify_subscribers(e);
             usleep(100);
@@ -58,7 +48,12 @@ int main(void){
     };
 
 
+    stream<int> int_stream(&pool, my_on_start);
 
+    subscriber<int> s1(func1_you_entered_int);
+    int_stream.register_subscriber(s1); 
+
+    std::cout << "stream1 " << &int_stream << endl;
 
 
     stream<int> int_stream(pool);
@@ -92,7 +87,12 @@ int main(void){
 
     mapped_stream.register_subscriber(s2);
 
+    std::cout << "stream2 " << &mapped_stream << endl;
+
+
+
 /////
+    /*
     auto mapped_stream2 = int_stream.map(
                 [](event<int> e) -> event<int> {
              return event<int>(100+ e.get_data());
@@ -101,23 +101,36 @@ int main(void){
 
     subscriber<int> s3(func3_you_entered_int);
 
-    mapped_stream2.register_subscriber(s3);
+    mapped_stream2.register_subscriber(s3);*/
 
+/////
+    /*
 
- auto mapped_stream3 = int_stream.map(
+    auto mapped_stream3 = int_stream.map(
                 [](event<int> e) -> event<int> {
              return event<int>(1000+ e.get_data());
          }
     );
 
     subscriber<int> s4(func4_you_entered_int);
-
     mapped_stream3.register_subscriber(s4);
+    */
 
+    auto mapped_stream4 = mapped_stream.map(
+                [](event<int> e) -> event<int> {
+             return event<int>(1000+ e.get_data());
+         }
+    );
 
+    subscriber<int> s5(func5_you_entered_int);
+    mapped_stream4.register_subscriber(s5);
+
+    std::cout << "stream3 " << &mapped_stream4 << endl;
 
 
     int_stream.start();
+
+
 
 
 	
