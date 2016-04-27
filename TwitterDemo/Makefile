@@ -11,13 +11,13 @@ CXXFLAGS = -std=c++14 -g -Wall $(INCLUDES) -o3
 LDFLAGS = -lcurl -loauth
 LDLIBS  =
 
-default: demo
-demo: demo.cpp
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) demo.cpp libs/twitcurl/urlencode.cpp -o demo
+default: twitter_streamer
+demo: twitter_streamer.cpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) twitter_streamer.cpp libs/twitcurl/urlencode.cpp -o twitter_streamer
 
 .PHONY: clean
 clean:
-	rm -f demo demo.o a.out core *.o
+	rm -f twitter_streamer twitter_streamer.o a.out core *.o
 
 .PHONY: all
 all: clean default
