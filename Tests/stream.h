@@ -95,9 +95,16 @@ public:
             return my_stream;
         };
 
-        // TODO:move constructor
-        stream(stream &&my_stream)  {
+        // move constructor
+        stream(stream &&other) 
+            : thread_pool(other.thread_pool)
+            , id(other.id)
+        {
             std::cout << "stream: move constructor called" << std::endl;
+            //thread_pool = other.thread_pool;
+            //id = other.id;
+            other.thread_pool = nullptr;
+            //other.id = 0;
         };
 
         std::function<void(stream<InputType> & my_stream)> on_start;
