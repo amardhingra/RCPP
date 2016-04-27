@@ -54,6 +54,7 @@ public:
     // assignment operator just assigns the reference
     stream& operator=(stream &my_stream){
         
+\
         //#ifdef 
         std::cout << "stream: operator= called" << std::endl;
         //#endif
@@ -116,11 +117,10 @@ public:
         thread_pool->notify_stream(id, new_event);
     };
 
-        /* --------------JULIE'S MESS BELOW --------------- */
 /* ---------------- FUNCTIONS TO START AND STOP STREAM --------------*/
 
 public:
-    // Starts the stream;
+    // Starts the stream
     void start(){
         if(on_start != nullptr){
             t = std::thread(std::bind(on_start, std::ref(*this)));
@@ -137,21 +137,25 @@ public:
 
 public:
 
+
     stream<InputType> filter(std::function<event<InputType>(event<InputType>)> filter_func){
-        // TODO
+    // TODO        
     }
 
-    stream<InputType> map(std::function<event<OutputType>(event<InputType>)> new_map_func){
-        stream<InputType> new_stream;
-        new_stream.map_func = new_map_func;
-        this->children.push_back(&new_stream);
-        return new_stream;
+    stream<OutputType> map(std::function<OutputType(InputType)> map_func){
+        stream<OutputType> mapped_stream(thread_pool);
 
-    };
+        subscriber<InputType> mapped_stream_feeder([&mapped_stream, map_func](event<InputType> e)
+        {
+            mapped_stream.notify(event<OutputType>(map_func(e.get_data())));
+        });
 
-    stream<InputType> reduce(std::function<event<InputType>(event<InputType>)> filter_func){
+
+/*
+    stream<InputType> reduce(std::function<event<InputType>(event<InputType>) filter_func){
+
         // TODO
-    }
+    }*/
 
 
 // functions/members prefixed with "st" are part of a single-threaded system that bypasses thread pool. Use these functions for debugging.
@@ -183,9 +187,7 @@ public:
             #endif
 
             my_subscriber.on_next(new_event);
-
         }
-
     }
 
     void print_subscribers() {
@@ -195,59 +197,6 @@ public:
         }
         std::cout << std::endl;
     }
-
-    std::vector<stream<OutputType> *> children;
-
-    std::function<event<OutputType>(event<InputType>)> map_func;
-
-
-    void notify_children(event<OutputType> e) {
-        for (stream<OutputType> *child_stream : children) {
-
-            child_stream->on_receive_event_from_parent(e);
-        }
-    }
-
-    void st_notify_children(event<OutputType> e) {
-        for (stream<OutputType> *child_stream : children) {
-            #ifdef DEBUG
-            std::cout << "notifying child stream " <<  child_stream << std::endl;
-            #endif
-            child_stream->st_on_receive_event_from_parent(e);
-        }
-    }
-
-    void on_receive_event_from_parent(event<InputType> e) {
-        #ifdef DEBUG
-        std::cout << "stream " << this << " received event" << std::endl;
-        #endif
-        
-        if (map_func != NULL) {
-            e = map_func(e);
-        }
-        
-        #ifdef DEBUG
-        usleep(100);
-        #endif
-        
-        notify_subscribers(e);
-    };
-
-    void st_on_receive_event_from_parent(event<InputType> e) {
-        #ifdef DEBUG
-        std::cout << "stream " << this << " received event" << std::endl;
-        #endif
-
-        if (map_func != NULL) {
-            event<InputType> new_e = map_func(e);
-            st_notify_subscribers(new_e);
-        }
-        else {
-            st_notify_subscribers(e);
-
-        }
-
-    };
 
 };
 
