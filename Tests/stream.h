@@ -128,7 +128,9 @@ public:
     };
 
     void complete(){
-        t.join();
+        if(t.joinable()){
+            t.join();
+        }
     }
 
 /* -------------------------- FILTER/MAP/REDUCE ------------------------*/
