@@ -1,9 +1,13 @@
 #ifndef INCLUDED_STREAM
 #define INCLUDED_STREAM
 
+#include <unistd.h>
+#include <boost/thread.hpp>
+#include <thread>
+#include <functional>
+
 #include "subscriber.h"
 #include "event.h"
-#include <unistd.h>
 
 typedef unsigned long stream_id;
 /*
@@ -16,6 +20,8 @@ typedef unsigned long stream_id;
 
 template <typename InputType, typename OutputType = InputType>
    class stream {
+
+private:
     //initially set to 0
     static stream_id unique_id;
     stream_id id;
@@ -43,6 +49,7 @@ public:
         };
 
         ~stream(){
+            complete();
             // if(owner && thread_pool != nullptr){
             //      delete thread_pool;
             //      thread_pool = nullptr;
@@ -70,10 +77,18 @@ public:
 
         /* --------------JULIE'S MESS BELOW --------------- */
 
+private:
+        std::thread t;
+public:
     // Starts the stream;
         void start(){
-            on_start(*this);
+            t = std::thread(std::bind(on_start, std::ref(*this)));
+            //on_start(*this);
         };
+
+        void complete(){
+            t.join();
+        }
 
     // create stream with pool and on_start
     // TODO: create version of this w/o pool arg once stream's default constructor gets fixed
