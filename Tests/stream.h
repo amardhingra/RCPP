@@ -54,9 +54,10 @@ public:
     // assignment operator just assigns the reference
     stream& operator=(stream &my_stream){
         
-        #ifdef DEBUG
+\
+        //#ifdef 
         std::cout << "stream: operator= called" << std::endl;
-        #endif
+        //#endif
         
         return my_stream;
     };
@@ -66,9 +67,9 @@ public:
         id(other.id),
         thread_pool(other.thread_pool){
         
-        #ifdef DEBUG
+        //#ifdef
         std::cout << "stream: move constructor called" << std::endl;
-        #endif
+        //#endif
         
         other.thread_pool = nullptr;
     };
@@ -135,10 +136,11 @@ public:
 /* -------------------------- FILTER/MAP/REDUCE ------------------------*/
 
 public:
-/*
-    stream<InputType> filter(std::function<event<InputType>(event<InputType>) filter_func){
-        // TODO
-    }*/
+
+
+    stream<InputType> filter(std::function<event<InputType>(event<InputType>)> filter_func){
+    // TODO        
+    }
 
     stream<OutputType> map(std::function<OutputType(InputType)> map_func){
         stream<OutputType> mapped_stream(thread_pool);
@@ -148,12 +150,10 @@ public:
             mapped_stream.notify(event<OutputType>(map_func(e.get_data())));
         });
 
-        this->register_subscriber(mapped_stream_feeder);
-        return mapped_stream;
-    }
 
 /*
     stream<InputType> reduce(std::function<event<InputType>(event<InputType>) filter_func){
+
         // TODO
     }*/
 

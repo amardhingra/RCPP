@@ -17,9 +17,9 @@ void func2(event<std::string> event){
 int main(void){
     using namespace std;
 
-    subscriber_pool<string> pool;
-    subscriber_pool<string>* pool_ptr = &pool;
-    stream<string> keyboard_stream(pool_ptr);
+    shared_ptr<subscriber_pool<string>> pool(new subscriber_pool<string>);
+    //subscriber_pool<string>* pool_ptr = &pool;
+    stream<string> keyboard_stream(pool);
 
     subscriber<string> s1(func1); 
     subscriber<string> s2(func2);
@@ -30,7 +30,7 @@ int main(void){
     keyboard_stream.on_start = [](stream<std::string> & my_stream) {
         for (int i = 1; i < 100; i ++) {
             event<std::string> e = event<std::string>(std::to_string(i));
-            my_stream.notify_subscribers(e);
+            my_stream.notify(e);
         
         // Description of bug: events get lost if I don't call sleep after each event is fired. 
         // Correct behavior: the numbers 100 - 104 should get printed to the screen, along with "The word you entered is longer than 2 characters".
