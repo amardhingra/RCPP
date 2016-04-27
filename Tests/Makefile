@@ -27,6 +27,10 @@ debugtest: test
 test: test.cpp stream.h subscriber.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) test.cpp -o test
 
+# success test
+test-map: test-map.cpp stream.h subscriber.h
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-map.cpp -o test-map.out
+
 # failing test
 test-fast-events-failing: test-fast-events-failing.cpp stream.h subscriber.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-fast-events-failing.cpp -o test-fast-events-failing.out
