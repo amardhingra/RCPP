@@ -9,10 +9,7 @@ void greater_than_3(event<int> event){
     };
 }
 
-void func1_you_entered_int(event<int> event){
-    using namespace std;
-    cout << "func1: you entered " << event.get_data() << endl;
-}
+
 
 void func2_you_entered_int(event<int> event){
     using namespace std;
@@ -48,33 +45,48 @@ int main(void){
 
     using namespace std;
 
-    subscriber_pool<int> pool;
+    shared_ptr<subscriber_pool<int>> pool(new subscriber_pool<int>);
 
-    std::function<void(stream<int> & my_stream)> my_on_start = [](stream<int> & my_stream) {
+    auto my_on_start = [&int_stream]() {
         for (int i = 1; i < 2; i ++) {
            // std::cout << "1" << endl;
             event<int> e(i);
-            my_stream.notify_children(e);
-            usleep(100);
-            my_stream.notify_subscribers(e);
+            int_stream.notify_subscribers(e);
             usleep(100);
 
          }
     };
 
-    stream<int> int_stream(&pool, my_on_start);
-   
-    subscriber<int> s1(func1_you_entered_int);
 
 
-    int_stream.register_subscriber(s1); 
 
 
-    auto mapped_stream = int_stream.map(
-        [](event<int> e) -> event<int> {
-             return event<int>(2 * e.get_data());
-         }
-    );
+    stream<int> int_stream(pool);
+
+    stream<int> mapped_stream(pool);
+
+    subscriber<int> mapped_stream_feeder([&mapped_stream](event<int> event) {
+        mapped_stream.notify_subscribers(event<int>(2 * e.get_data()));           
+    });
+
+    int_stream.register_subscriber(mapped_stream_feeder); 
+
+
+
+    stream<string> mapped_stream = int_stream.map(std::int_to_string)
+
+    map(std::function<OutputType(InputType)> func){
+        stream<OutputType> mapped_stream(pool);
+
+        subscriber<InputType> feeder([&mapped_stream](event<InputType> event)
+        {
+            mapped_stream.notify_subscribers(event<OutputType>(func(event.get_data())));
+        });
+
+        pool.register_subscriber(feeder);
+        return mapped_stream;
+    }
+
 
     subscriber<int> s2(func2_you_entered_int);
 
