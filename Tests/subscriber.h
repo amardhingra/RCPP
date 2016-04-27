@@ -15,7 +15,6 @@
 #include "event.h"
 // #include "stream.h"
 
-#define MAX_SUB_THREADS 16
 
 typedef unsigned long sub_id;
 typedef unsigned long stream_id;
@@ -177,7 +176,7 @@ private:
 
     void grow(){
         auto size = subscribers.size();
-        if(pool.size() < MAX_SUB_THREADS && ((float) subscribers.size()) / pool.size() >= 4){
+        if(((float) subscribers.size()) / pool.size() >= 4){
             pool.push_back(std::thread(&subscriber_pool<T>::handle_event, this));
         }
     };
