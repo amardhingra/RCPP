@@ -97,8 +97,9 @@ public:
 
         // move constructor
         stream(stream &&other) 
-            : thread_pool(other.thread_pool)
-            , id(other.id)
+            : id(other.id)
+            , thread_pool(other.thread_pool)
+             
         {
             std::cout << "stream: move constructor called" << std::endl;
             //thread_pool = other.thread_pool;
