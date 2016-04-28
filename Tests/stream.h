@@ -64,9 +64,9 @@ public:
         id(other.id),
         thread_pool(other.thread_pool){
         
-        //#ifdef
+        #ifdef DEBUG
         std::cout << "stream: move constructor called" << std::endl;
-        //#endif
+        #endif
         
         other.thread_pool = nullptr;
     };

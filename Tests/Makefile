@@ -17,10 +17,10 @@ objects = test \
 		  test-file-stream \
 		  test-fast-events-failing \
 		  test-stream-constructor \
-		  test-2-streams-share-pool-failing \
-		  test-2-streams-share-pool-failing2 \
-		  test-2-streams-diff-pools-failing \
-		  test-2-streams-diff-pools-failing2 \
+		  test-2-streams-share-pool \
+		  test-2-streams-share-pool2 \
+		  test-2-streams-diff-pools \
+		  test-2-streams-diff-pools2 \
 		  #test-merge \
 
 
