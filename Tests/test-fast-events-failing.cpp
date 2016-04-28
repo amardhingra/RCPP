@@ -19,15 +19,7 @@ int main(void){
 
     shared_ptr<subscriber_pool<string>> pool(new subscriber_pool<string>);
     //subscriber_pool<string>* pool_ptr = &pool;
-    stream<string> keyboard_stream(pool);
-
-    subscriber<string> s1(func1); 
-    subscriber<string> s2(func2);
-
-    vector<subscriber<string>> slist = {s1, s2};   
-    keyboard_stream.register_subscriber(slist); 
-
-    keyboard_stream.on_start = [](stream<std::string> & my_stream) {
+    stream<string> keyboard_stream(pool, [](stream<std::string> & my_stream) {
         for (int i = 1; i < 100; i ++) {
             event<std::string> e = event<std::string>(std::to_string(i));
             my_stream.notify(e);
@@ -38,7 +30,14 @@ int main(void){
         // Uncommenting below line results in correct behavior.
         usleep(50);
         }
-     };
+     });
+
+    subscriber<string> s1(func1); 
+    subscriber<string> s2(func2);
+
+    vector<subscriber<string>> slist = {s1, s2};   
+    keyboard_stream.register_subscribers(slist); 
+
 
      keyboard_stream.start();
      //keyboard_stream.complete();

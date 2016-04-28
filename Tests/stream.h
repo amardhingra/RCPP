@@ -105,7 +105,7 @@ public:
                                     stream<InputType, OutputType>& l_stream,
                                     stream<InputType, OutputType>& r_stream){
 
-        stream<InputType, OutputType> merged_stream;
+        stream<InputType, OutputType> merged_stream(nullptr);
 
         l_stream.register_subscriber(subscriber<InputType>([&merged_stream](event<InputType> e){
             merged_stream.notify(e);
@@ -174,7 +174,7 @@ public:
 
 
     stream<InputType> filter(std::function<bool(InputType)> filter_func){
-        stream<OutputType> filtered_stream(thread_pool);
+        stream<InputType> filtered_stream(thread_pool);
   
         subscriber<InputType> filtered_stream_feeder([&filtered_stream, filter_func](event<InputType> e)
         {

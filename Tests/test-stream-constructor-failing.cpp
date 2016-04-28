@@ -50,7 +50,7 @@ int main(void){
 
     vector<subscriber<int>> slist = {s1, s2};   
 
-    int_stream.register_subscriber(slist); 
+    int_stream.register_subscribers(slist); 
     int_stream.start();
 
     return 0;

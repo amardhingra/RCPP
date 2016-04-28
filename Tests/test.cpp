@@ -1,6 +1,9 @@
 #include "stream.h"
 #include "event.h"
 #include "subscriber.h"
+#include "stream_factory.h"
+
+#include <functional>
 
 void greater_than_3(event<int> event){
     using namespace std;
