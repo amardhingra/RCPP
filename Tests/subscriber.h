@@ -236,6 +236,11 @@ public:
     };
     
     void notify_stream(stream_id str_id, event<T> event){
+        
+        // check if there any subscribers
+        if(stream_subs.count(str_id) == 0) return;
+        
+        // notify all the streams subscribers
         for(auto id : stream_subs.at(str_id)){
             notify(id, event);
         }
@@ -254,6 +259,18 @@ public:
     };
 
     // used to notify a subscriber that a stream has ended
+    void error_stream(stream_id str_id, std::exception e){
+        
+        // check if there any subscribers
+        if(stream_subs.count(str_id) == 0) return;
+        
+        // notify all the streams subscribers
+        for(auto id : stream_subs.at(str_id)){
+            error(id, e);
+        }
+    };
+
+    // used to notify a subscriber that a stream has ended
     void complete(sub_id id){
         // lock the subscriber pool
         while(!e_lock.try_lock());
@@ -268,6 +285,17 @@ public:
         e_lock.unlock();
         // call the subscribers on_complete function
         sub.on_completed();
+    };
+
+    // used to notify a subscriber that a stream has ended
+    void complete_stream(stream_id str_id){
+        /// check if there any subscribers
+        if(stream_subs.count(str_id) == 0) return;
+        
+        // notify all the streams subscribers
+        for(auto id : stream_subs.at(str_id)){
+            complete(id);
+        }
     };
 
     // used to register a subscriber with the current subscriber_pool
