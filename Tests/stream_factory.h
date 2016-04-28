@@ -12,21 +12,27 @@ class file_stream{
 
     std::ifstream file;
     char delim;
+    std::string filepath;
 
 public:
     file_stream(std::string filename, char _delim = '\n') :
-    file(filename), delim(_delim) {};
+    file(filename), delim(_delim), filepath(filename) {};
 
-    void operator(stream<std::string> str)(){
-        if (!file) {
-            return;
-        }   
+    file_stream(const file_stream &fs) :
+    file(fs.filepath), delim(fs.delim), filepath(fs.filepath) {};
+
+    void operator()(stream<std::string> &str){
+        bool flag = true;
+
+        if(!file){
+            flag = false;
+        }
+
         std::string buf;
-        while(!file.eof()){
+        while(flag && !file.eof()){
             std::getline(file, buf, delim);
-            std::cout << buf << std::endl;
             event<std::string> e(buf);
-            str.notify_subscribers(e);
+            str.notify(e);
         }
     }
 
