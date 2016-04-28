@@ -56,3 +56,8 @@ Pods
 # generated files
 *.dSYM
 *.plist
+
+#other
+*~
+*.log
+a.out
