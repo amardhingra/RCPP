@@ -51,16 +51,6 @@ public:
     // disable copy constructor
     stream(const stream& stream_to_copy) = delete;
 
-    // assignment operator just assigns the reference
-    stream& operator=(stream &my_stream){
-        
-        //#ifdef 
-        std::cout << "stream: operator= called" << std::endl;
-        //#endif
-        
-        return my_stream;
-    };
-
     // move constructor
     stream(stream &&other) : 
         id(other.id),
@@ -71,6 +61,19 @@ public:
         //#endif
         
         other.thread_pool = nullptr;
+    };
+
+/* ---------------- CREATING NEW STREAMS FROM EXISTING STREAMS --------------*/
+
+
+    // assignment operator just assigns the reference
+    stream& operator=(stream &my_stream){
+        
+        //#ifdef 
+        std::cout << "stream: operator= called" << std::endl;
+        //#endif
+        
+        return my_stream;
     };
 
     // move assignment operator
@@ -89,6 +92,31 @@ public:
         }
         return *this;
     };
+
+    friend stream<InputType, OutputType> operator+(
+                                    stream<InputType, OutputType>& l_stream,
+                                    stream<InputType, OutputType>& r_stream){
+
+        stream<InputType, OutputType> merged_stream;
+
+        l_stream.register_subscriber(subscriber<InputType>([&merged_stream](event<InputType> e){
+            merged_stream.notify(e);
+        }));
+
+        r_stream.register_subscriber(subscriber<InputType>([&merged_stream](event<InputType> e){
+            merged_stream.notify(e);
+        }));
+        return merged_stream;
+    }
+
+    void operator+=(stream<InputType, OutputType>& r_stream){
+
+        r_stream.register_subscriber(subscriber<InputType>([this](event<InputType> e){
+            this->notify(e);
+        }));
+
+    }
+
 
 /* --------------------- SUBSCRIBER FUNCTIONS -------------------*/
 public:        
