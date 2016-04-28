@@ -8,11 +8,11 @@
 #include <curl/curl.h>
 #include <sstream>
 #include <chrono>
+#include "twitter_dataparser.h"
 
 using namespace std;
 
-size_t f_CALLBACK(char* ptr, size_t size, size_t n_mem, string* streams);
-//size_t f_WRITE(char *data, size_t size, size_t n_mem, void *usrdata);
+size_t f_CALLBACK(char *data, size_t size, size_t n_mem, void *streams);
 
 class twit_streamer
 {
@@ -26,7 +26,8 @@ class twit_streamer
     string  chunks;
 
     public:
-    twit_streamer(const char*, const char*, const char*, const char*, const char*);
+    void (*m_callback)(parse);
+    twit_streamer(void (*callback)(parse),const char*, const char*, const char*, const char*, const char*);
     bool runDemo();  // start twitter app
 };
 

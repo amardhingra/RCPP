@@ -20,53 +20,41 @@ parse::parse(const char *json_data)   // trying to parse incoming stream
 	Json::Value root;
 	Json::Reader reader;
         Json::StyledWriter styledWriter;
-	std::string s = json_data;
-	std::string delimiter = "\r\n";
+//	std::string s = json_data;
+//        cout << s;
+/*	
+        std::string delimiter = "\r\n";
 	size_t pos = 0;
 	std::string token;
 	while ((pos = s.find(delimiter)) != std::string::npos) {
     	token = s.substr(0, pos);
     	std::cout << token << std::endl;
     	s.erase(0, pos + delimiter.length());
-	}
+
+        
+        //
 	//std::string::iterator end_pos = std::remove(s.begin(), s.end(), ' ');
 	//s.erase(end_pos, s.end());
 	//remove_if(s.begin(), s.end(), ::isspace);
 	//std::cout << s << '\n';
-
+*/
 	//cout << json_data
-/*	vector<Json::Value> results;        // STORES each tweet into the vector with proper syntax (No missing brackets)(how to get json from the vector)?
+	vector<string> results;        // STORES each tweet into the vector with proper syntax (No missing brackets)(how to get json from the vector)?
 	boost::split(results, json_data, boost::is_any_of("\r\n"));
 	for (auto i: results){
 		std::cout << i << '\n';
 		}
-*/
+/*
 
 	
-/*std::vector<Json::Value> twitterIDS(const Json::Value& root) {
-    std::vector<Json::Value> res;
-    for (const Json::Value& twitterID : root["id"])  // iterate over "books"
-    {
-        if (book["author"].asString() == "Petr")   // if by "Petr"
-        {
-            res.push_back(book);                   // take a copy
-        }
-    }
-    return res;                                    // and return
-
-}
-
-*/
-
-
-/*	
+	
         bool parsedSUCCESS = reader.parse(json_data,root,false);
         if (!parsedSUCCESS)
         {
         cout << reader.getFormattedErrorMessages() << endl;
 	return;
         }
-	if(root.get("created_at", "").asString().length() > 0)
+	if(root.get("user", "").asString().length() > 0)
 	{
 	
 		m_id = root.get("id", 0).asInt64();
@@ -74,11 +62,11 @@ parse::parse(const char *json_data)   // trying to parse incoming stream
 		m_followers = root["user"].get("followers_count", 0).asInt();
 		m_retweets = root.get("retweet_count", 0).asInt();
 	}
-*/
+
 
 
 	
-/*
+
 	if(!reader.parse(s, root))
 	{
 	        cout << "failed to decode tweet JSON!\n" << reader.getFormattedErrorMessages() << s << "\n\n";
