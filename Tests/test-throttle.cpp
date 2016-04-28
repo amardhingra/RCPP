@@ -47,7 +47,7 @@ int main(void){
         for (int i = 1; i < 10; i ++) {
             event<int> e(i);
             my_stream.notify(e);
-            usleep(600);
+            usleep(100);
         }
     };
 
@@ -64,6 +64,5 @@ int main(void){
 
     // start parent stream
     int_stream.start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
     return 0;
 }

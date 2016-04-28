@@ -31,7 +31,7 @@ private:
     std::thread                                  t;           // thread on which to run the on_start function
     std::function<void(stream<InputType> & my_stream)> on_start; // function to be called to generate data
     bool                                         is_throttled_stream = false; //are we a throttled stream?
-    std::chrono::milliseconds                    last_emitted_time;
+    std::chrono::system_clock::time_point          last_emitted_time;
     std::chrono::milliseconds                    throttle_rate;                   
 
 /* ---------------- STREAM CONSTRUCTORS AND OPERATORS --------------*/
@@ -44,7 +44,7 @@ public:
         id(unique_id++),
         thread_pool(some_pool),
         on_start(on_start),
-        last_emitted_time(0),
+        last_emitted_time(std::chrono::system_clock::now()),
         throttle_rate(0)
         {
             //std::cout << "constructor 1 called" << std::endl;
@@ -56,7 +56,7 @@ public:
         id(unique_id++),
         thread_pool(some_pool),
         on_start(on_start),
-        last_emitted_time(0),
+        last_emitted_time(std::chrono::system_clock::now()),
         throttle_rate(0)
         {
             //std::cout << "constructor 2 called" << std::endl;
@@ -76,7 +76,7 @@ public:
         id(other.id),
         thread_pool(other.thread_pool),
         on_start(other.on_start),
-        last_emitted_time(0),
+        last_emitted_time(std::chrono::system_clock::now()),
         throttle_rate(0){
         
         //#ifdef DEBUG
@@ -109,8 +109,8 @@ public:
             thread_pool = other.thread_pool;
             id = other.id;
             on_start = other.on_start;
-            last_emitted_time = 0;
-            throttle_rate = 0;
+            last_emitted_time = other.last_emitted_time,
+            throttle_rate = other.throttle_rate;
             
             
             std::cout << &thread_pool << std::endl;
@@ -175,12 +175,11 @@ public:
 
         if(!is_throttled_stream){
             thread_pool->notify_stream(id, new_event);
+            return;
         }
 
-        milliseconds now = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-        std::cout << now;
-        std::cout << id << ' ' << (std::chrono::duration_cast<std::chrono::milliseconds>(now - last_emitted_time)).count() << ' ' << throttle_rate.count() << std::endl;
-        if(std::chrono::duration_cast<std::chrono::milliseconds>(now - last_emitted_time) >= throttle_rate){
+        system_clock::time_point now = system_clock::now();
+        if((now - last_emitted_time).count() > throttle_rate.count()){
             last_emitted_time = now;
             thread_pool->notify_stream(id, new_event);
         }
@@ -258,6 +257,7 @@ public:
     stream<InputType> throttle(unsigned int milliseconds){
         std::chrono::milliseconds time(milliseconds);
         stream<OutputType> throttled_stream(thread_pool);
+        
         throttled_stream.set_throttle_rate(time);
   
         subscriber<InputType> throttled_stream_feeder([&throttled_stream](event<InputType> e)
@@ -276,6 +276,7 @@ public:
     void set_throttle_rate(std::chrono::milliseconds time){
         is_throttled_stream = true;
         throttle_rate = time;
+        last_emitted_time = std::chrono::system_clock::now() - throttle_rate;
     }
 
 // functions/members prefixed with "st" are part of a single-threaded system that bypasses thread pool. Use these functions for debugging.
