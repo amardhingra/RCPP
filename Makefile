@@ -13,7 +13,7 @@ LDLIBS  =
 
 default: startDemo
 
-startDemo: startDemo.o twitter_streamer.o
+startDemo: startDemo.o twitter_streamer.o twitter_dataparser.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 startDemo.o: startDemo.cpp
@@ -21,6 +21,10 @@ startDemo.o: startDemo.cpp
 
 twitter_streamer.o: TwitterDemo/twitter_streamer.cpp TwitterDemo/libs/twitcurl/urlencode.cpp TwitterDemo/twitter_streamer.h
 	$(CC) -c $(CFLAGS) $<
+
+twitter_dataparser.o: TwitterDemo/twitter_dataparser.cpp TwitterDemo/twitter_dataparser.h
+	$(CC) -c $(CFLAGS) $<
+
 
 .PHONY: clean
 clean:
