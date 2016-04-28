@@ -46,49 +46,44 @@ int main(void){
 
     // stream definition
     auto my_on_start = [](stream<int> & my_stream) {
-        for (int i = 1; i < 3; i ++) {
+        for (int i = 1; i < 10; i ++) {
             event<int> e(i);
             my_stream.notify(e);
             usleep(100);
-
         }
     };
 
     // parent stream
     stream<int> int_stream(pool, my_on_start);
 
-    // parent stream's subscriber
-    subscriber<int> s1(func1_you_entered_int);
-    int_stream.register_subscriber(s1); 
-
     // mapped stream #1 from parent
-    stream<int> mapped_stream = int_stream.map([](int input) {
-            return 2 * input;
+    stream<int> filtered_stream = int_stream.filter([](int input) {
+            return input % 2 == 0;
         }
     );
 
     subscriber<int> s2(func2_you_entered_int);
-    mapped_stream.register_subscriber(s2);
+    filtered_stream.register_subscriber(s2);
 
     // mapped stream #2 from parent
-    auto mapped_stream2 = int_stream.map(
+    auto filtered_stream2 = int_stream.filter(
         [](int input) {
-           return 1000 + input;
+           return input < 5;
        }
     );
 
     subscriber<int> s3(func3_you_entered_int);
-    mapped_stream2.register_subscriber(s3);
+    filtered_stream2.register_subscriber(s3);
 
     // mapped stream #3 from mapped stream #1
-    auto mapped_stream3 = mapped_stream.map(
+    auto filtered_stream3 = filtered_stream.filter(
         [](int input) {
-           return 100 + input;
+           return input % 4 == 0;
        }
     );
 
     subscriber<int> s4(func4_you_entered_int);
-    mapped_stream3.register_subscriber(s4);
+    filtered_stream3.register_subscriber(s4);
 
     // start parent stream
     int_stream.start();

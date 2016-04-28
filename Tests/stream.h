@@ -28,7 +28,7 @@ private:
     std::shared_ptr<subscriber_pool<InputType>>  thread_pool; // subscriber pool to use for handling events
     std::thread                                  t;           // thread on which to run the on_start function
     std::function<void(stream<InputType> & my_stream)> on_start; // function to be called to generate data
-    //bool changed = false;
+
 
 /* ---------------- STREAM CONSTRUCTORS AND OPERATORS --------------*/
 
@@ -137,8 +137,18 @@ public:
 public:
 
 
-    stream<InputType> filter(std::function<event<InputType>(event<InputType>)> filter_func){
-        // TODO        
+    stream<InputType> filter(std::function<bool(InputType)> filter_func){
+        stream<OutputType> filtered_stream(thread_pool);
+  
+        subscriber<InputType> filtered_stream_feeder([&filtered_stream, filter_func](event<InputType> e)
+        {
+            if(filter_func(e.get_data())){
+                filtered_stream.notify(e);
+            }
+        });
+  
+        this->register_subscriber(filtered_stream_feeder);
+        return filtered_stream;      
     };
 
     stream<OutputType> map(std::function<OutputType(InputType)> map_func){
