@@ -49,16 +49,15 @@ int main(void){
     };
 
     // construct stream 1 using pool1
-    stream<int> stream1(&pool1);
-    stream1.on_start = my_on_start;
+    stream<int> stream1(pool1, my_on_start);
 
     // stream1's subscriber
     subscriber<int> s1(func1_you_entered_int); 
     stream1.register_subscriber(s1); 
 
     // constructing stream 2 with its own pool
-    subscriber_pool<int> pool2;
     shared_ptr<subscriber_pool<int>> pool2(new subscriber_pool<int>);
+    stream<int> stream2(pool2, my_on_start);
 
     // stream2's subscriber
     subscriber<int> s2(func2_you_entered_int);

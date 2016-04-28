@@ -64,8 +64,7 @@ int main(void){
     };
 
     // construct stream 1 using pool1
-    stream<int> stream1(&pool1);
-    stream1.on_start = my_on_start1;
+    stream<int> stream1(pool1, my_on_start1);
 
     // stream1's subscriber
     subscriber<int> s1(func1_you_entered_int); 
@@ -81,8 +80,7 @@ int main(void){
     };
 
     // construct stream 2 using pool1
-    stream<int> stream2(&pool1);
-    stream2.on_start = my_on_start2;
+    stream<int> stream2(pool1, my_on_start2);
 
     // stream2's subscriber
     subscriber<int> s2(func2_you_entered_int); 

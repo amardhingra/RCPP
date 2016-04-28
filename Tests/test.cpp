@@ -60,8 +60,7 @@ int main(void){
 
     stream<int> mapped_stream = int_stream.map([](int input) {
         return 2 * input;
-    }
-        );
+    });
 
     subscriber<int> s2(func2_you_entered_int);
 

@@ -54,7 +54,6 @@ public:
     // assignment operator just assigns the reference
     stream& operator=(stream &my_stream){
         
-\
         //#ifdef 
         std::cout << "stream: operator= called" << std::endl;
         //#endif
@@ -89,7 +88,7 @@ public:
             other.thread_pool = nullptr;
         }
         return *this;
-    }
+    };
 
 /* --------------------- SUBSCRIBER FUNCTIONS -------------------*/
 public:        
@@ -131,7 +130,7 @@ public:
         if(t.joinable()){
             t.join();
         }
-    }
+    };
 
 /* -------------------------- FILTER/MAP/REDUCE ------------------------*/
 
@@ -139,23 +138,25 @@ public:
 
 
     stream<InputType> filter(std::function<event<InputType>(event<InputType>)> filter_func){
-    // TODO        
-    }
+        // TODO        
+    };
 
     stream<OutputType> map(std::function<OutputType(InputType)> map_func){
-        stream<OutputType> mapped_stream(thread_pool);
+         stream<OutputType> mapped_stream(thread_pool);
+  
+         subscriber<InputType> mapped_stream_feeder([&mapped_stream, map_func](event<InputType> e)
+         {
+             mapped_stream.notify(event<OutputType>(map_func(e.get_data())));
+         });
+  
+         this->register_subscriber(mapped_stream_feeder);
+         return mapped_stream;
+    };
 
-        subscriber<InputType> mapped_stream_feeder([&mapped_stream, map_func](event<InputType> e)
-        {
-            mapped_stream.notify(event<OutputType>(map_func(e.get_data())));
-        });
 
-
-/*
-    stream<InputType> reduce(std::function<event<InputType>(event<InputType>) filter_func){
-
+    stream<InputType> reduce(std::function<event<InputType>(event<InputType>)> reduce_func){
         // TODO
-    }*/
+    };
 
 
 // functions/members prefixed with "st" are part of a single-threaded system that bypasses thread pool. Use these functions for debugging.
@@ -188,7 +189,7 @@ public:
 
             my_subscriber.on_next(new_event);
         }
-    }
+    };
 
     void print_subscribers() {
         std::cout << "subscribers: ";
@@ -196,7 +197,7 @@ public:
             std::cout << my_subscriber.id << " ";
         }
         std::cout << std::endl;
-    }
+    };
 
 };
 
