@@ -152,6 +152,23 @@ public:
         thread_pool->notify_stream(id, new_event);
     };
 
+    /*
+     * Function that is called to notify the streams subscribers that the
+     * stream has encountered an error that they need to process
+     */
+    void error(std::exception e){
+        thread_pool->error_stream(id, e);
+    }
+
+    /*
+     * Function that is called to notify the streams subscribers that the
+     * stream has ended and for them to do any cleanup required
+     */
+    void end_stream(){
+        thread_pool->complete_stream(id);
+    }
+
+
 /* ---------------- FUNCTIONS TO START AND STOP STREAM --------------*/
 
 public:

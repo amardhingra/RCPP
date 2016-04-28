@@ -48,7 +48,8 @@ public:
 
     static void simple_on_error(std::exception e){};
 
-    static void simple_on_completed(){};
+    static void simple_on_completed(){
+    };
 
 public:
     // constructor only requires an on_next function
@@ -137,20 +138,25 @@ private:
                 e_cond.wait(lk);
 
                 // exit on flag
+                // if(end){
+                //     lk.unlock();
+                //     return;
+                // }
+            }
+
+            // if(end){
+            //     lk.unlock();
+            //     return;
+            // }
+
+            // get event from queue and remove it from queue
+            if(events.size() == 0){
                 if(end){
                     lk.unlock();
                     return;
                 }
-            }
-
-            if(end){
-                lk.unlock();
-                return;
-            }
-
-            // get event from queue and remove it from queue
-            if(events.size() == 0)
                 continue;
+            }
 
             struct queue_event ev = events.front();
             events.pop_front();

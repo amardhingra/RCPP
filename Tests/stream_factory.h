@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
 
 #include "stream.h"
 #include "event.h"
@@ -34,6 +35,9 @@ public:
             event<std::string> e(buf);
             str.notify(e);
         }
+
+        usleep(100);
+        str.end_stream();
     }
 
 };
