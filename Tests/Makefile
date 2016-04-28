@@ -16,7 +16,7 @@ objects = test \
 		  test-filter \
 		  test-file-stream \
 		  test-fast-events-failing \
-		  test-stream-constructor-failing \
+		  test-stream-constructor \
 		  test-2-streams-share-pool-failing \
 		  test-2-streams-share-pool-failing2 \
 		  test-2-streams-diff-pools-failing \

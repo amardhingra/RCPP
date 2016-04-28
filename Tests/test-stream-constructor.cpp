@@ -32,16 +32,11 @@ int main(void){
          }
     };
 
-    // this works
-    //stream<int> int_stream(pool);
+    //construction taking in a pool
+    stream<int> int_stream1(pool, my_on_start);
 
-    // Description of bug: Using default stream constructor results in hang when you try to register_subscriber on that stream. 
-    // Correct behavior: should print numbers from 1-6; printing out each number; telling you if the number is greater than 3.
-    // Current(buggy) behavior: The program hangs while trying to get the lock in register_subscriber. "trying to get lock" printed to screen repeatedly.
-    // Commenting out the below initializer and Using the above, commented-out initializer (the one that takes pool_ptr) will result in correct behavior. 
-
-    // this fails
-    stream<int> int_stream(my_on_start);
+    //construction taking only a on_start function
+    stream<int> int_stream2(my_on_start);
 
     //int_stream.on_start = my_on_start;
 
@@ -50,8 +45,9 @@ int main(void){
 
     vector<subscriber<int>> slist = {s1, s2};   
 
-    int_stream.register_subscribers(slist); 
-    int_stream.start();
+    int_stream2.register_subscribers(slist); 
+    int_stream1.start();
+    int_stream2.start();
 
     return 0;
 }
