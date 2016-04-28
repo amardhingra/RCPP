@@ -41,17 +41,17 @@ public:
         thread_pool(some_pool),
         on_start(on_start)
         {
-            std::cout << "constructor 1 called" << std::endl;
+            //std::cout << "constructor 1 called" << std::endl;
         };
 
     // constructor with shared thread pool
-    stream(const std::function<void(stream<InputType> & my_stream)> & on_start = nullptr,
+    stream(const std::function<void(stream<InputType> & my_stream)> & on_start,
         std::shared_ptr<subscriber_pool<InputType>> some_pool = std::shared_ptr<subscriber_pool<InputType>>(new subscriber_pool<InputType>)) :
         id(unique_id++),
         thread_pool(some_pool),
         on_start(on_start)
         {
-            std::cout << "constructor 2 called" << std::endl;
+            //std::cout << "constructor 2 called" << std::endl;
         };
         
     // 
@@ -70,7 +70,7 @@ public:
         on_start(other.on_start){
         
         //#ifdef DEBUG
-        std::cout << "stream: move constructor called" << std::endl;
+        //std::cout << "stream: move constructor called" << std::endl;
         //#endif
         other.on_start = nullptr;
         other.thread_pool = nullptr;
@@ -83,7 +83,7 @@ public:
     stream& operator=(stream &my_stream){
         
         //#ifdef 
-        std::cout << "stream: operator= called" << std::endl;
+        //std::cout << "stream: operator= called" << std::endl;
         //#endif
         
         return my_stream;
@@ -115,7 +115,7 @@ public:
                                     stream<InputType, OutputType>& l_stream,
                                     stream<InputType, OutputType>& r_stream){
 
-        stream<InputType, OutputType> merged_stream(nullptr);
+        stream<InputType, OutputType> merged_stream;
 
         l_stream.register_subscriber(subscriber<InputType>([&merged_stream](event<InputType> e){
             merged_stream.notify(e);

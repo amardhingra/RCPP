@@ -8,6 +8,7 @@
 #include <memory>
 #include <iostream>
 #include <chrono>
+#include <unistd.h>
 
 void print(event<std::string> s){
     std::cout << s.get_data() << std::endl;
@@ -20,6 +21,7 @@ int main(void){
     
     stream<int> str1(pool_str, [](stream<int>& str){
         for(int i = 0; i < 100; i += 2){
+            usleep(100);
             str.notify(event<int>(i));
         }
     });
@@ -27,6 +29,7 @@ int main(void){
     stream<int> str2(pool_str, [](stream<int>& str){
         for(int i = 1; i < 100; i += 2){
             str.notify(event<int>(i));
+            usleep(100);
         }
     });
 
@@ -43,6 +46,7 @@ int main(void){
 
     stream<int> str4(pool_str, [](stream<int>& str){
         for(int i = 0; i < 100; i += 2){
+            usleep(100);
             str.notify(event<int>(i));
         }
     });
@@ -50,6 +54,7 @@ int main(void){
     stream<int> str5(pool_str, [](stream<int>& str){
         for(int i = 1; i < 100; i += 2){
             str.notify(event<int>(i));
+            usleep(100);
         }
     });
 
