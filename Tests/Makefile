@@ -31,6 +31,10 @@ obj: $(objects)
 $(objects):
 
 
+debug: CXXFLAGS += -DDEBUG -g
+debug: CCFLAGS += -DDEBUG -g
+debug: obj
+
 .PHONY: clean
 clean:
 	rm -rf *~ *.o *.out *.dSYM $(objects)

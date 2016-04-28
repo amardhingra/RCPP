@@ -66,12 +66,13 @@ public:
     // move constructor
     stream(stream &&other) : 
         id(other.id),
-        thread_pool(other.thread_pool){
+        thread_pool(other.thread_pool),
+        on_start(other.on_start){
         
         //#ifdef DEBUG
         std::cout << "stream: move constructor called" << std::endl;
         //#endif
-        
+        other.on_start = nullptr;
         other.thread_pool = nullptr;
     };
 
@@ -97,6 +98,7 @@ public:
             // Copy the thread_pool pointer and its id from the source object.
             thread_pool = other.thread_pool;
             id = other.id;
+            on_start = other.on_start;
             
             
             std::cout << &thread_pool << std::endl;
@@ -104,6 +106,7 @@ public:
              // Release the thread_pool pointer from the source object so that
             // the destructor does not free the memory multiple times.
             other.thread_pool = nullptr;
+            other.on_start = nullptr;
         }
         return *this;
     };
