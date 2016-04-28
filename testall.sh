@@ -38,7 +38,7 @@ SignalError() {
 # Compares the outfile with reffile.  Differences, if any, written to difffile
 Compare() {
     generatedfiles="$generatedfiles $3"
-    echo diff -b $1 $2 ">" $3 1>&2
+    echo diff -b -B $1 $2 ">" $3 1>&2
     diff -b "$1" "$2" > "$3" 2>&1 || {
 	SignalError "$1 differs"
 	echo "FAILED $1 differs from $2" 1>&2
@@ -121,5 +121,7 @@ do
 	    ;;
     esac
 done
+
+rm -rf *.out *.gr *.dSYM
 
 exit $globalerror
