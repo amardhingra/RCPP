@@ -9,6 +9,18 @@ INCLUDES = -I/usr/local/include
 LDFLAGS = -L/usr/local/lib -lboost_thread-mt -lboost_system
 LDLIBS = 
 
+objects = test \
+		   test-map \
+		   test-filter \
+		   test-file-stream \
+		   test-fast-events-failing \
+		   test-stream-constructor-failing \
+		   test-2-streams-share-pool-failing \
+		   test-2-streams-share-pool-failing2 \
+		   test-2-streams-diff-pools-failing \
+		   test-2-streams-diff-pools-failing2 \
+		   #test-merge \
+
 
 executables: helloworld test test-2-streams-share-pool-failing2 test-2-streams-diff-pools-failing test-2-streams-diff-pools-failing2
 $(objects): stream.h subscriber.h
@@ -66,7 +78,7 @@ test-2-streams-diff-pools-failing2: test-2-streams-diff-pools-failing2.cpp strea
 
 .PHONY: clean
 clean:
-	rm -rf *~ *.o helloworld2 helloworld test-fast-events-failing a.out subscriber test *.out *.dSYM
+	rm -rf *~ *.o helloworld2 helloworld test-fast-events-failing a.out subscriber test *.out *.dSYM $(objects)
 
 .PHONY: all
 all: clean executables
