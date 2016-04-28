@@ -15,7 +15,6 @@
 #include "event.h"
 // #include "stream.h"
 
-#define MAX_SUB_THREADS 16
 
 typedef unsigned long sub_id;
 typedef unsigned long stream_id;
@@ -37,10 +36,6 @@ public:
     // function that is called when the stream generates new data
     std::function<void(event<T>)> on_next;
 
-   // std::function<void(event<T>)> julie_on_next;
-
-
-
     // function that is called when the stream encounters an error
     std::function<void(std::exception)> on_error;
 
@@ -53,7 +48,8 @@ public:
 
     static void simple_on_error(std::exception e){};
 
-    static void simple_on_completed(){};
+    static void simple_on_completed(){
+    };
 
 public:
     // constructor only requires an on_next function
@@ -142,20 +138,25 @@ private:
                 e_cond.wait(lk);
 
                 // exit on flag
+                // if(end){
+                //     lk.unlock();
+                //     return;
+                // }
+            }
+
+            // if(end){
+            //     lk.unlock();
+            //     return;
+            // }
+
+            // get event from queue and remove it from queue
+            if(events.size() == 0){
                 if(end){
                     lk.unlock();
                     return;
                 }
-            }
-
-            if(end){
-                lk.unlock();
-                return;
-            }
-
-            // get event from queue and remove it from queue
-            if(events.size() == 0)
                 continue;
+            }
 
             struct queue_event ev = events.front();
             events.pop_front();
@@ -177,7 +178,7 @@ private:
 
     void grow(){
         auto size = subscribers.size();
-        if(pool.size() < MAX_SUB_THREADS && ((float) subscribers.size()) / pool.size() >= 4){
+        if(((float) subscribers.size()) / pool.size() >= 4){
             pool.push_back(std::thread(&subscriber_pool<T>::handle_event, this));
         }
     };
@@ -237,6 +238,11 @@ public:
     };
     
     void notify_stream(stream_id str_id, event<T> event){
+        
+        // check if there any subscribers
+        if(stream_subs.count(str_id) == 0) return;
+        
+        // notify all the streams subscribers
         for(auto id : stream_subs.at(str_id)){
             notify(id, event);
         }
@@ -255,6 +261,18 @@ public:
     };
 
     // used to notify a subscriber that a stream has ended
+    void error_stream(stream_id str_id, std::exception e){
+        
+        // check if there any subscribers
+        if(stream_subs.count(str_id) == 0) return;
+        
+        // notify all the streams subscribers
+        for(auto id : stream_subs.at(str_id)){
+            error(id, e);
+        }
+    };
+
+    // used to notify a subscriber that a stream has ended
     void complete(sub_id id){
         // lock the subscriber pool
         while(!e_lock.try_lock());
@@ -269,6 +287,17 @@ public:
         e_lock.unlock();
         // call the subscribers on_complete function
         sub.on_completed();
+    };
+
+    // used to notify a subscriber that a stream has ended
+    void complete_stream(stream_id str_id){
+        /// check if there any subscribers
+        if(stream_subs.count(str_id) == 0) return;
+        
+        // notify all the streams subscribers
+        for(auto id : stream_subs.at(str_id)){
+            complete(id);
+        }
     };
 
     // used to register a subscriber with the current subscriber_pool
@@ -290,9 +319,6 @@ public:
         //TODO: it'll hang here forever if you make the stream using stream's default constructor
         // lock the subscriber pool
         while(!sub_lock.try_lock());
-        // std::cout << "trying to get lock" << std::endl;
-
-        // std::cout << "got the lock" << std::endl;
 
         // add a stream_id mapping
         subscribers.insert(std::pair<sub_id, subscriber<T>>(sub.id, sub));

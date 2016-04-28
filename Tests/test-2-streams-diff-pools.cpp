@@ -1,6 +1,6 @@
 #include "stream.h"
-#include "event.h"
-#include "subscriber.h"
+//#include "event.h"
+//#include "subscriber.h"
 
 /* BUG:
 stream1 and stream2 are created using different pools. each stream gets a subscriber. then stream1 starts. 
@@ -37,28 +37,27 @@ int main(void){
     using namespace std;
 
     // stream1's pool
-    subscriber_pool<int> pool1;
+    shared_ptr<subscriber_pool<int>> pool1(new subscriber_pool<int>);
 
     // stream1's definition
     std::function<void(stream<int> & my_stream)> my_on_start = [](stream<int> & my_stream) {
         for (int i = 1; i < 6; i ++) {
             event<int> e(i);
-            my_stream.notify_subscribers(e);
+            my_stream.notify(e);
             usleep(100);
          }
     };
 
     // construct stream 1 using pool1
-    stream<int> stream1(&pool1);
-    stream1.on_start = my_on_start;
+    stream<int> stream1(pool1, my_on_start);
 
     // stream1's subscriber
     subscriber<int> s1(func1_you_entered_int); 
     stream1.register_subscriber(s1); 
 
     // constructing stream 2 with its own pool
-    subscriber_pool<int> pool2;
-    stream<int> stream2(&pool2);
+    shared_ptr<subscriber_pool<int>> pool2(new subscriber_pool<int>);
+    stream<int> stream2(pool2, my_on_start);
 
     // stream2's subscriber
     subscriber<int> s2(func2_you_entered_int);
@@ -67,5 +66,7 @@ int main(void){
     // start stream 1
     stream1.start();
 
+    // start stream 2
+    stream2.start();
     return 0;
 }

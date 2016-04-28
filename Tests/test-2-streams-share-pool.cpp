@@ -1,8 +1,8 @@
 #include <unistd.h>
 
 #include "stream.h"
-#include "event.h"
-#include "subscriber.h"
+//#include "event.h"
+//#include "subscriber.h"
 
 /* BUG:
 stream1 is defined and a subscriber s1 is added to it, then stream2 is defined and subscriber s2 is added to it. the 2 streams share a pool. then stream1 starts. 
@@ -36,27 +36,27 @@ int main(void){
 
     using namespace std;
 
-    subscriber_pool<int> pool;
+    shared_ptr<subscriber_pool<int>> pool(new subscriber_pool<int>);
 
     std::function<void(stream<int> & my_stream)> my_on_start = [](stream<int> & my_stream) {
         for (int i = 1; i < 6; i ++) {
             event<int> e(i);
-            my_stream.notify_subscribers(e);
+            my_stream.notify(e);
             usleep(100);
          }
     };
 
-    // define stream 1
-
-    stream<int> stream1(&pool);
-    stream1.on_start = my_on_start;
-
+    // define stream 1 with pool
+    stream<int> stream1(pool, my_on_start);
+    
+    //stream1's subscriber
     subscriber<int> s1(func1_you_entered_int);
     stream1.register_subscriber(s1); 
-    // defining stream 2
 
-    stream<int> stream2(&pool);
+    // defining stream 2 with same pool
+    stream<int> stream2(pool, my_on_start);
 
+    //stream2's subscriber
     subscriber<int> s2(func2_you_entered_int);
     stream2.st_register_subscriber(s2);
 
@@ -64,5 +64,7 @@ int main(void){
     // start stream 1
     stream1.start();
 
+    // start stream 2
+    stream2.start();
     return 0;
 }
