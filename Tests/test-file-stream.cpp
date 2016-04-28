@@ -1,6 +1,4 @@
 #include "stream.h"
-#include "event.h"
-#include "subscriber.h"
 #include "stream_factory.h"
 
 #include <functional>
