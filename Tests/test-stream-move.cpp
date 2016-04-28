@@ -33,7 +33,7 @@ int main(void){
     //The below fails. Line 35 fails to compile. Line 36 results in seg fault when starting stream1, and results in stream2 not doing anything when registering subscribers to stream2.
 
     //stream<int> int_stream2;
-    //stream<int> int_stream2 = std::move(int_stream1);
+    stream<int> int_stream2 = std::move(int_stream1);
 
 
     subscriber<int> s1(greater_than_3);
@@ -41,9 +41,9 @@ int main(void){
 
     vector<subscriber<int>> slist = {s1, s2};   
 
-    int_stream1.register_subscribers(slist); 
+    int_stream2.register_subscribers(slist); 
     
-    int_stream1.start();
+    int_stream2.start();
 
     return 0;
 }

@@ -40,7 +40,9 @@ public:
         id(unique_id++),
         thread_pool(some_pool),
         on_start(on_start)
-        {};
+        {
+            std::cout << "constructor 1 called" << std::endl;
+        };
 
     // constructor with shared thread pool
     stream(const std::function<void(stream<InputType> & my_stream)> & on_start = nullptr,
@@ -48,7 +50,9 @@ public:
         id(unique_id++),
         thread_pool(some_pool),
         on_start(on_start)
-        {};
+        {
+            std::cout << "constructor 2 called" << std::endl;
+        };
         
     // 
     ~stream(){
@@ -64,9 +68,9 @@ public:
         id(other.id),
         thread_pool(other.thread_pool){
         
-        #ifdef DEBUG
+        //#ifdef DEBUG
         std::cout << "stream: move constructor called" << std::endl;
-        #endif
+        //#endif
         
         other.thread_pool = nullptr;
     };
@@ -93,6 +97,9 @@ public:
             // Copy the thread_pool pointer and its id from the source object.
             thread_pool = other.thread_pool;
             id = other.id;
+            
+            
+            std::cout << &thread_pool << std::endl;
 
              // Release the thread_pool pointer from the source object so that
             // the destructor does not free the memory multiple times.
