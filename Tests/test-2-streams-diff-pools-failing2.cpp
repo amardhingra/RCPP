@@ -112,6 +112,7 @@ int main(void){
     // try doing these in different orders, different weird things happen
     
     stream2.start();
+    sleep(1);
     stream1.start();
 
 
