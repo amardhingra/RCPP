@@ -42,6 +42,14 @@ public:
         on_start(on_start)
         {};
 
+    // constructor with shared thread pool
+    stream(const std::function<void(stream<InputType> & my_stream)> & on_start = nullptr,
+        std::shared_ptr<subscriber_pool<InputType>> some_pool = std::shared_ptr<subscriber_pool<InputType>>(new subscriber_pool<InputType>)) :
+        id(unique_id++),
+        thread_pool(some_pool),
+        on_start(on_start)
+        {};
+        
     // 
     ~stream(){
         // wait for the stream to finish
