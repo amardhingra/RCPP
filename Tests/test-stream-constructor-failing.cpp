@@ -41,9 +41,9 @@ int main(void){
     // Commenting out the below initializer and Using the above, commented-out initializer (the one that takes pool_ptr) will result in correct behavior. 
 
     // this fails
-    stream<int> int_stream;
+    stream<int> int_stream(my_on_start);
 
-    int_stream.on_start = my_on_start;
+    //int_stream.on_start = my_on_start;
 
     subscriber<int> s1(greater_than_3);
     subscriber<int> s2(you_entered_int);

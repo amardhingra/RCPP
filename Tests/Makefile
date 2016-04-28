@@ -10,7 +10,7 @@ LDFLAGS = -L/usr/local/lib -lboost_thread-mt -lboost_system
 LDLIBS = 
 
 
-executables: helloworld test test-2-streams-share-pool-failing2 test-2-streams-diff-pools-failing test-2-streams-diff-pools-failing2
+executables: test test-2-streams-share-pool-failing2 test-2-streams-diff-pools test-2-streams-diff-pools-failing2 test-stream-constructor-failing test-map test-filter
 $(objects): stream.h subscriber.h
 
 debug: CXXFLAGS += -DDEBUG -g
@@ -49,17 +49,17 @@ test-stream-constructor-failing: test-stream-constructor-failing.cpp stream.h su
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-stream-constructor-failing.cpp -o test-stream-constructor-failing.out
 
 # failing test
-test-2-streams-share-pool-failing: test-2-streams-share-pool-failing.cpp stream.h subscriber.h
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-2-streams-share-pool-failing.cpp -o test-2-streams-share-pool-failing.out
+test-2-streams-share-pool: test-2-streams-share-pool.cpp stream.h subscriber.h
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-2-streams-share-pool.cpp -o test-2-streams-share-pool-failing.out
 
 # failing test
-test-2-streams-share-pool-failing2: test-2-streams-share-pool-failing2.cpp stream.h subscriber.h
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-2-streams-share-pool-failing2.cpp -o test-2-streams-share-pool-failing2.out
+test-2-streams-share-pool2: test-2-streams-share-pool-2.cpp stream.h subscriber.h
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-2-streams-share-pool2.cpp -o test-2-streams-share-pool-failing2.out
 
-test-2-streams-diff-pools-failing: test-2-streams-diff-pools-failing.cpp stream.h subscriber.h
+test-2-streams-diff-pools: test-2-streams-diff-pools.cpp stream.h subscriber.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-2-streams-diff-pools-failing.cpp -o test-2-streams-diff-pools-failing.out
 
-test-2-streams-diff-pools-failing2: test-2-streams-diff-pools-failing2.cpp stream.h subscriber.h
+test-2-streams-diff-pools2: test-2-streams-diff-pools2.cpp stream.h subscriber.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-2-streams-diff-pools-failing2.cpp -o test-2-streams-diff-pools-failing2.out
 
 
