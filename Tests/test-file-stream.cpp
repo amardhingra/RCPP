@@ -17,7 +17,10 @@ int main(void){
 
     shared_ptr<subscriber_pool<string>> pool_str(new subscriber_pool<string>);
     stream<std::string> file_streamer(pool_str, file_stream("test.txt"));
-    subscriber<string> s(print);
+    subscriber<string> s([](event<std::string> s){
+        std::cout << s.get_data() << std::endl;
+    });
+    
     file_streamer.register_subscriber(s);
 
     file_streamer.start();

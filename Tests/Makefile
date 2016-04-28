@@ -34,6 +34,12 @@ test-map: test-map.cpp stream.h subscriber.h
 test-filter: test-filter.cpp stream.h subscriber.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-filter.cpp -o test-filter.out
 
+test-file-stream: test-file-stream.cpp stream.h subscriber.h
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-file-stream.cpp -o test-file-stream.out
+
+test-merge: test-merge.cpp stream.h subscriber.h
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-merge.cpp -o test-merge.out
+
 # failing test
 test-fast-events-failing: test-fast-events-failing.cpp stream.h subscriber.h
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) test-fast-events-failing.cpp -o test-fast-events-failing.out

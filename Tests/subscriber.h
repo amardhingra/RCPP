@@ -36,10 +36,6 @@ public:
     // function that is called when the stream generates new data
     std::function<void(event<T>)> on_next;
 
-   // std::function<void(event<T>)> julie_on_next;
-
-
-
     // function that is called when the stream encounters an error
     std::function<void(std::exception)> on_error;
 
