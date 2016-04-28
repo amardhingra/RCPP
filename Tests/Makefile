@@ -17,6 +17,8 @@ objects = test \
 		  test-file-stream \
 		  test-fast-events-failing \
 		  test-stream-constructor \
+		  test-stream-move \
+		  test-stream-copy \
 		  test-2-streams-share-pool \
 		  test-2-streams-share-pool2 \
 		  test-2-streams-diff-pools \
