@@ -6,9 +6,11 @@
 #include <thread>
 #include <functional>
 #include <memory>
+#include <chrono>
 
 #include "subscriber.h"
 #include "event.h"
+
 
 typedef unsigned long stream_id;
 
@@ -28,7 +30,9 @@ private:
     std::shared_ptr<subscriber_pool<InputType>>  thread_pool; // subscriber pool to use for handling events
     std::thread                                  t;           // thread on which to run the on_start function
     std::function<void(stream<InputType> & my_stream)> on_start; // function to be called to generate data
-
+    bool                                         is_throttled_stream = false; //are we a throttled stream?
+    std::chrono::milliseconds                    last_emitted_time;
+    std::chrono::milliseconds                    throttle_rate;                   
 
 /* ---------------- STREAM CONSTRUCTORS AND OPERATORS --------------*/
 
@@ -39,7 +43,9 @@ public:
         const std::function<void(stream<InputType> & my_stream)> & on_start = nullptr) :
         id(unique_id++),
         thread_pool(some_pool),
-        on_start(on_start)
+        on_start(on_start),
+        last_emitted_time(0),
+        throttle_rate(0)
         {
             //std::cout << "constructor 1 called" << std::endl;
         };
@@ -49,7 +55,9 @@ public:
         std::shared_ptr<subscriber_pool<InputType>> some_pool = std::shared_ptr<subscriber_pool<InputType>>(new subscriber_pool<InputType>)) :
         id(unique_id++),
         thread_pool(some_pool),
-        on_start(on_start)
+        on_start(on_start),
+        last_emitted_time(0),
+        throttle_rate(0)
         {
             //std::cout << "constructor 2 called" << std::endl;
         };
@@ -67,7 +75,9 @@ public:
     stream(stream &&other) : 
         id(other.id),
         thread_pool(other.thread_pool),
-        on_start(other.on_start){
+        on_start(other.on_start),
+        last_emitted_time(0),
+        throttle_rate(0){
         
         //#ifdef DEBUG
         //std::cout << "stream: move constructor called" << std::endl;
@@ -99,6 +109,8 @@ public:
             thread_pool = other.thread_pool;
             id = other.id;
             on_start = other.on_start;
+            last_emitted_time = 0;
+            throttle_rate = 0;
             
             
             std::cout << &thread_pool << std::endl;
@@ -159,7 +171,19 @@ public:
      * provided filter, map and reduce operations
      */
     void notify(event<InputType> new_event){
-        thread_pool->notify_stream(id, new_event);
+        using namespace std::chrono;
+
+        if(!is_throttled_stream){
+            thread_pool->notify_stream(id, new_event);
+        }
+
+        milliseconds now = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+        std::cout << now;
+        std::cout << id << ' ' << (std::chrono::duration_cast<std::chrono::milliseconds>(now - last_emitted_time)).count() << ' ' << throttle_rate.count() << std::endl;
+        if(std::chrono::duration_cast<std::chrono::milliseconds>(now - last_emitted_time) >= throttle_rate){
+            last_emitted_time = now;
+            thread_pool->notify_stream(id, new_event);
+        }
     };
 
     /*
@@ -231,6 +255,28 @@ public:
         // TODO
     };
 
+    stream<InputType> throttle(unsigned int milliseconds){
+        std::chrono::milliseconds time(milliseconds);
+        stream<OutputType> throttled_stream(thread_pool);
+        throttled_stream.set_throttle_rate(time);
+  
+        subscriber<InputType> throttled_stream_feeder([&throttled_stream](event<InputType> e)
+        {
+            throttled_stream.notify(event<OutputType>(e));
+        });
+  
+        this->register_subscriber(throttled_stream_feeder);
+        return throttled_stream;
+    };
+
+/* ---------------------------------- HELPER -----------------------------------*/
+
+public: 
+
+    void set_throttle_rate(std::chrono::milliseconds time){
+        is_throttled_stream = true;
+        throttle_rate = time;
+    }
 
 // functions/members prefixed with "st" are part of a single-threaded system that bypasses thread pool. Use these functions for debugging.
 /* -------------------------- SINGLE THREADED FUNCTIONS ------------------------*/

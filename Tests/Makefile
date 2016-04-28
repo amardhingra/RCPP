@@ -14,6 +14,8 @@ dependencies = stream.h subscriber.h event.h stream_factory.h
 objects = test \
 		  test-map \
 		  test-filter \
+		  test-merge \
+		  test-throttle \
 		  test-file-stream \
 		  test-fast-events-failing \
 		  test-stream-constructor \
@@ -23,7 +25,7 @@ objects = test \
 		  test-2-streams-share-pool2 \
 		  test-2-streams-diff-pools \
 		  test-2-streams-diff-pools2 \
-		  #test-merge \
+		  
 
 
 obj: $(objects)

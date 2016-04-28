@@ -20,16 +20,16 @@ int main(void){
     shared_ptr<subscriber_pool<int>> pool_str(new subscriber_pool<int>(2));
     
     stream<int> str1(pool_str, [](stream<int>& str){
-        for(int i = 0; i < 100; i += 2){
-            usleep(100);
+        for(int i = 0; i < 10; i += 2){
+            usleep(10);
             str.notify(event<int>(i));
         }
     });
 
     stream<int> str2(pool_str, [](stream<int>& str){
-        for(int i = 1; i < 100; i += 2){
+        for(int i = 1; i < 10; i += 2){
             str.notify(event<int>(i));
-            usleep(100);
+            usleep(10);
         }
     });
 
@@ -45,16 +45,16 @@ int main(void){
     std::cout << std::endl;
 
     stream<int> str4(pool_str, [](stream<int>& str){
-        for(int i = 0; i < 100; i += 2){
-            usleep(100);
+        for(int i = 0; i < 10; i += 2){
+            usleep(10);
             str.notify(event<int>(i));
         }
     });
 
     stream<int> str5(pool_str, [](stream<int>& str){
-        for(int i = 1; i < 100; i += 2){
+        for(int i = 1; i < 10; i += 2){
             str.notify(event<int>(i));
-            usleep(100);
+            usleep(10);
         }
     });
 
