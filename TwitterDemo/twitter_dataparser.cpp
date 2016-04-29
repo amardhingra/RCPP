@@ -64,23 +64,6 @@ parse::parse(const char *json_data)   // trying to parse incoming stream
     };
 
 
-    //move assignment taking only a on_start function
-    stream<string> twitter_stream(my_on_start);
-
-    // //call copy constructor... generates error!
-    // stream<int> int_stream2 = int_stream1;
-
-
-    subscriber<string> s1(string_output);
-
-    twitter_stream.start();
-    // subscriber<int> s2(you_entered_int);
-
-    // vector<subscriber<int>> slist = {s1, s2};   
-
-    // int_stream2.register_subscribers(slist); 
-    
-    // int_stream2.start();
 /*
 
 	
