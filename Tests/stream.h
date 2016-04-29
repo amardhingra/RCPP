@@ -281,7 +281,7 @@ public:
 // functions/members prefixed with "st" are part of a single-threaded system that bypasses thread pool. Use these functions for debugging.
 /* -------------------------- SINGLE THREADED FUNCTIONS ------------------------*/
 
-public:
+private:
     std::vector<subscriber<InputType>> st_my_subscribers;
 
     void st_register_subscriber(const subscriber<InputType> & new_subscriber){
