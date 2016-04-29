@@ -3,18 +3,18 @@ CXX = g++ -O0
 
 #-fno-elide-constructors
 
-INCLUDES =
+INCLUDES = -I/usr/local/include
 
-CFLAGS   = -std=c++14  -g -Wall $(INCLUDES)
+CFLAGS   = -std=c++11  -g -Wall $(INCLUDES)
 #CXXFLAGS = -std=c++14 -g -Wall $(INCLUDES) -o3
 
-LDFLAGS = -lcurl -loauth -ljsoncpp
-LDLIBS  =
+LDFLAGS =  -L/usr/local/lib -lcurl -loauth -ljsoncpp
+LDLIBS  = 
 
 default: startDemo
 
 startDemo: startDemo.o twitter_streamer.o twitter_dataparser.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ 
 
 startDemo.o: startDemo.cpp
 	$(CC) -c $(CFLAGS) $<
