@@ -34,12 +34,24 @@ int main(int argc, char **argv)
     const char *ACCTOK_KEY = "332151906-wl9kRcvzoji8zJ3ZJIeOqmv8SZBwz1eC5BA2glJp";
     const char *ACCTOK_SEC = "CJKsLPOq3nfEWyjXm9Y2mFXYPt1sTImvDewySX4wABCH7";
 
-    // Instantiate new object
-   
     twit_streamer objDemo = twit_streamer(&callback, URL, CONSU_KEY, CONSU_SEC, ACCTOK_KEY, ACCTOK_SEC);
+
+    // Instantiate new object
+    stream<string> s(objDemo);
+    stream<string> s2 = s.filter([](event<string> e){
+        std::cout << "filtering........................................." << std::endl;
+        if(e.get_data().find(string("President")) != std::string::npos){
+            std::cout << "FOUND" << std::endl;
+            return true;
+        }
+        return false;
+    });
+    s2.register_subscriber(subscriber<string>([](event<string> e){
+        cout << e.get_data() << endl;
+    }));
     // twit_streamer objDemo(&callback, URL, CONSU_KEY, CONSU_SEC, ACCTOK_KEY, ACCTOK_SEC);
     cout << "Starting the TwitterDemo...\n";
-    objDemo.runDemo();
+    s.start();
    
     return 0;
 

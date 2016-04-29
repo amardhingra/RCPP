@@ -1,12 +1,18 @@
 #include "twitter_streamer.h"
 
+
 size_t f_CALLBACK(char *data, size_t size, size_t nmemb, void *streams)
 {
         if(data != NULL)
 	{
-		twit_streamer *objDemo = (twit_streamer*)(streams);
-		parse t = parse(data);
-		objDemo->m_callback(t);
+
+		//twit_streamer *objDemo = (twit_streamer*)(streams);
+		//parse t = parse(data);
+        std::string s = data;
+        ((stream<string> *)streams)->notify(event<string>(s));
+        // std::cout << s;
+        //stream.notify(event<string>(s));
+		//objDemo->m_callback(data);
 	}
 	else
 	{
@@ -29,9 +35,8 @@ twit_streamer::twit_streamer(           // constr
     this->c_ACCTOKSEC = c_ACCTOKSEC;
 }
 
-bool twit_streamer::runDemo()
+void twit_streamer::operator()(stream<string> &str)
 {
-    
     std::chrono::time_point<std::chrono::system_clock> start_twit, end_twit;        // TIMER Settings
     curl_global_init(CURL_GLOBAL_ALL);      // INIT CURL CODE
     CURLcode res;
@@ -42,7 +47,7 @@ bool twit_streamer::runDemo()
         cout << "ERROR failed: curl_easy_init" << endl;
         curl_global_cleanup();
         
-        return false;
+        return;
         }
         
         else if (curl)
@@ -66,10 +71,11 @@ bool twit_streamer::runDemo()
         //curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, f_CALLBACK);
         //curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &chunk);
         
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &str);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, f_CALLBACK);
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);                          // enable verbose mode for debug
     
+
         start_twit = std::chrono::system_clock::now();                      // start timing how long it takes
         res = curl_easy_perform(curl);  // execute
         end_twit = std::chrono::system_clock::now();
@@ -79,14 +85,14 @@ bool twit_streamer::runDemo()
     // CLEANUP
         if (res != CURLE_OK) {
             cerr <<"\ncurl_easy_perform() failed: " << curl_easy_strerror(res) << "\n";
-            return false;
+            return;
     }
         curl_easy_cleanup(curl);
 //        curl_global_cleanup();
     }
     else
     {
-        return false;
+        return;
     }
-    return 0;
+    return;
     }

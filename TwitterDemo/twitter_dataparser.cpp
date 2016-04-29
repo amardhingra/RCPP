@@ -2,6 +2,12 @@
 #include <fstream>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
+#include "stream.h"
+
+void string_output(event<string> event){   
+   std::cout << event.get_data() << '\n';
+
+}
 
 parse::parse() {}
 parse::parse(const parse &tweet)
@@ -15,13 +21,15 @@ parse::parse(const parse &tweet)
 	m_language = tweet.m_language;
 }
 
+
+
 parse::parse(const char *json_data)   // trying to parse incoming stream
 {
 	Json::Value root;
 	Json::Reader reader;
         Json::StyledWriter styledWriter;
-//	std::string s = json_data;
-//        cout << s;
+    std::string s = json_data;
+          //std::cout << s;
 /*	
         std::string delimiter = "\r\n";
 	size_t pos = 0;
@@ -40,10 +48,39 @@ parse::parse(const char *json_data)   // trying to parse incoming stream
 */
 	//cout << json_data
 	vector<string> results;        // STORES each tweet into the vector with proper syntax (No missing brackets)(how to get json from the vector)?
-	boost::split(results, json_data, boost::is_any_of("\r\n"));
-	for (auto i: results){
-		std::cout << i << '\n';
-		}
+	boost::split(results, s, boost::is_any_of("\r\n"));
+	// for (auto i: results){
+	// 	std::cout << i << '\n';
+	// }
+
+	std::function<void(stream<string> & my_stream)> my_on_start = [s](stream<string> & my_stream) {
+        
+            
+            event<string> e(s);
+            my_stream.notify(e);
+
+
+         
+    };
+
+
+    //move assignment taking only a on_start function
+    stream<string> twitter_stream(my_on_start);
+
+    // //call copy constructor... generates error!
+    // stream<int> int_stream2 = int_stream1;
+
+
+    subscriber<string> s1(string_output);
+
+    twitter_stream.start();
+    // subscriber<int> s2(you_entered_int);
+
+    // vector<subscriber<int>> slist = {s1, s2};   
+
+    // int_stream2.register_subscribers(slist); 
+    
+    // int_stream2.start();
 /*
 
 	
