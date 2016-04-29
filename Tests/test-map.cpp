@@ -49,8 +49,7 @@ int main(void){
         for (int i = 1; i < 3; i ++) {
             event<int> e(i);
             my_stream.notify(e);
-            usleep(100);
-
+            usleep(500);
         }
     };
 
@@ -67,28 +66,28 @@ int main(void){
         }
     );
 
-    subscriber<int> s2(func2_you_entered_int);
-    mapped_stream.register_subscriber(s2);
+    // subscriber<int> s2(func2_you_entered_int);
+    // mapped_stream.register_subscriber(s2);
 
-    // mapped stream #2 from parent
-    auto mapped_stream2 = int_stream.map(
-        [](int input) {
-           return 1000 + input;
-       }
-    );
+    // // mapped stream #2 from parent
+    // auto mapped_stream2 = int_stream.map(
+    //     [](int input) {
+    //        return 1000 + input;
+    //    }
+    // );
 
-    subscriber<int> s3(func3_you_entered_int);
-    mapped_stream2.register_subscriber(s3);
+    // subscriber<int> s3(func3_you_entered_int);
+    // mapped_stream2.register_subscriber(s3);
 
-    // mapped stream #3 from mapped stream #1
-    auto mapped_stream3 = mapped_stream.map(
-        [](int input) {
-           return 100 + input;
-       }
-    );
+    // // mapped stream #3 from mapped stream #1
+    // auto mapped_stream3 = mapped_stream.map(
+    //     [](int input) {
+    //        return 100 + input;
+    //    }
+    // );
 
-    subscriber<int> s4(func4_you_entered_int);
-    mapped_stream3.register_subscriber(s4);
+    // subscriber<int> s4(func4_you_entered_int);
+    // mapped_stream3.register_subscriber(s4);
 
     // start parent stream
     int_stream.start();

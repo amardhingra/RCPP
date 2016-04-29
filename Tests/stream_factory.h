@@ -22,24 +22,26 @@ public:
     file_stream(const file_stream &fs) :
     file(fs.filepath), delim(fs.delim), filepath(fs.filepath) {};
 
-    void operator()(stream<std::string> &str){
-        bool flag = true;
-
-        if(!file){
-            flag = false;
-        }
-
-        std::string buf;
-        while(flag && !file.eof()){
-            std::getline(file, buf, delim);
-            event<std::string> e(buf);
-            str.notify(e);
-        }
-
-        usleep(100);
-        str.end_stream();
-    }
+    void operator()(stream<std::string> &str);
 
 };
+
+void file_stream::operator()(stream<std::string> &str){
+    bool flag = true;
+
+    if(!file){
+        flag = false;
+        str.error();
+    }
+
+    std::string buf;
+    while(flag && !file.eof()){
+        std::getline(file, buf, delim);
+        event<std::string> e(buf);
+        str.notify(e);
+    }
+
+    str.end_stream();
+}
 
 #endif

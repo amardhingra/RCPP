@@ -26,7 +26,6 @@ int main(void){
          }
     };
 
-
     //move assignment taking only a on_start function
     stream<int> int_stream1 = stream<int>(my_on_start);
 
