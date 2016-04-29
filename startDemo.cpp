@@ -1,6 +1,17 @@
+/*
+
+In order for this to work on Mac OS X you need to have oauth and jsoncpp installed. Run the following:
+
+>ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
+>brew install oauth
+>brew install jsoncpp
+
+*/
+#include "Tests/stream.h"
 #include <vector>
 #include "TwitterDemo/twitter_dataparser.h"
 #include "TwitterDemo/twitter_streamer.h"
+
 
 void callback(parse t)
 {
