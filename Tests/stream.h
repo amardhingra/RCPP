@@ -126,7 +126,6 @@ public:
     friend stream<InputType, OutputType> operator+(
                                     stream<InputType, OutputType>& l_stream,
                                     stream<InputType, OutputType>& r_stream){
-
         stream<InputType, OutputType> merged_stream;
 
         l_stream.register_subscriber(subscriber<InputType>([&merged_stream](event<InputType> e){
