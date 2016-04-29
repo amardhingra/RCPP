@@ -9,10 +9,11 @@
 #include <sstream>
 #include <chrono>
 #include "twitter_dataparser.h"
+#include "stream.h"
 
 using namespace std;
 
-size_t f_CALLBACK(char *data, size_t size, size_t n_mem, void *streams);
+size_t f_CALLBACK(char *data, size_t size, size_t n_mem, void *streams); // start twitter app
 
 class twit_streamer
 {
@@ -23,11 +24,23 @@ class twit_streamer
     const char* c_ACCTOKSEC;
     CURL    *curl;
     char*   c_OAUTHURL;
-    string  chunks;
+    string  next_tweet;
+    bool    has_next_tweet = false;
+    
 
     public:
     void (*m_callback)(parse);
     twit_streamer(void (*callback)(parse),const char*, const char*, const char*, const char*, const char*);
-    bool runDemo();  // start twitter app
+    void operator()(stream<string> &stream); 
+    // void operator()(stream<std::string>& stream)
+    // {
+    //     while(1){
+    //         // get string from the twitter api
+    //         std::string str = get_next_data();
+    //         stream.notify(event<std::string>(str));
+
+    //     }
+
+    // };
 };
 
