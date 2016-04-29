@@ -11,6 +11,8 @@
 #include <vector>
 #include <thread>
 #include <iostream>
+#include <cmath>
+#include <algorithm>
 
 #include "event.h"
 // #include "stream.h"
@@ -117,14 +119,14 @@ private:
 
     bool                                   end = false; // tells threads when to exit
     sub_id                                 id = 0; // used for sequentially registering subscribers with unique ids
-    std::map<sub_id, subscriber<T>>       subscribers; // maintains a map of subscribers for fast lookup
+    std::map<sub_id, subscriber<T>>         subscribers; // maintains a map of subscribers for fast lookup
     std::list<queue_event>                 events; // list of events to be processed
     std::mutex                             e_lock; // used to syncronize access to list
     std::condition_variable                e_cond; // used to let worker threads sleep
     std::mutex                             sub_lock; // used to synchronize access to the subscriber map
     std::vector<std::thread>               pool; // maintains a list of runnning threads
-
-    std::map<stream_id, std::vector<sub_id>>  stream_subs;
+    std::map<stream_id, std::vector<sub_id>>  stream_subs; // map from stream id to subscriber
+    std::function<unsigned int(unsigned int, unsigned int)> grow_function;
 
     // function passed to threads to handle subscriber_events
     void handle_event(){
@@ -137,17 +139,7 @@ private:
 
                 e_cond.wait(lk);
 
-                // exit on flag
-                // if(end){
-                //     lk.unlock();
-                //     return;
-                // }
             }
-
-            // if(end){
-            //     lk.unlock();
-            //     return;
-            // }
 
             // get event from queue and remove it from queue
             if(events.size() == 0){
@@ -176,28 +168,27 @@ private:
         }
     };
 
-    void grow(){
-        auto size = subscribers.size();
-        if(((float) subscribers.size()) / pool.size() >= 4){
+    static unsigned int simple_grow(unsigned int subscribers, unsigned int threads){
+        return std::max<int>(std::ceil(float(subscribers) / threads) - 4, 0);
+    }
+
+    void grow(unsigned int num){
+        for(unsigned int i = 0; i < num; i++){
             pool.push_back(std::thread(&subscriber_pool<T>::handle_event, this));
         }
     };
 public:
 
     // constructor with default concurrency level set to 1
-    subscriber_pool(int concurrency = 1){
-
-        // never make more than 16 threads
-        int max = concurrency > 16 ? 16 : concurrency;
+    subscriber_pool(int concurrency = 1, std::function<unsigned int(unsigned int, unsigned int)> grow_func = simple_grow){
 
         // create threads based on the concurrency requested
-        for(int i = 0; i < max; i++){
+        for(int i = 0; i < concurrency; i++){
             pool.push_back(std::thread(&subscriber_pool<T>::handle_event, this));
         }
 
-#ifdef DEBUG
-        std::cout << "Constructed pool" << std::endl;
-#endif
+        grow_function = grow_func;
+
     };
 
     // destructor
@@ -217,6 +208,7 @@ public:
 
     // called to pass a new subscriber_event to subscriber given by sub_id
     void notify(sub_id id, event<T> event){
+        
         // create an event to add to the queue
         struct queue_event ev(id, event);
 
@@ -302,15 +294,17 @@ public:
 
     // used to register a subscriber with the current subscriber_pool
     void register_subscriber(subscriber<T> sub){
-
         // lock the subscriber pool
         while(!sub_lock.try_lock());
         
         // OLD: add the subscriber to the map
         subscribers.insert(std::pair<sub_id, subscriber<T>>(id, sub));
-        
+        unsigned int num_subs = subscribers.size();
+        unsigned int num_threads = pool.size();
         // unlock the subscriber pool
         sub_lock.unlock();
+
+        grow(grow_function(num_subs, num_threads));
     };
 
     // used to register a subscriber and indicate the stream it is associated with
@@ -324,8 +318,12 @@ public:
         subscribers.insert(std::pair<sub_id, subscriber<T>>(sub.id, sub));
         stream_subs[id].push_back(sub.id);
 
+        unsigned int num_subs = subscribers.size();
+        unsigned int num_threads = pool.size();
+
         // unlock the subscriber pool
         sub_lock.unlock();
+        grow(grow_function(num_subs, num_threads));
     };
 
 };
